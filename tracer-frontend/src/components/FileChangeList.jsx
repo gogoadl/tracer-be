@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import FileDiffView from './FileDiffView';
-import { fetchFileChanges } from '../api';
+import ConfirmDialog from './ConfirmDialog';
+import { fetchFileChanges, deleteFileChange } from '../api';
 
 const FileChangeList = () => {
   const [changes, setChanges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleting, setDeleting] = useState({});
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, changeId: null });
 
   useEffect(() => {
     loadChanges();
@@ -26,6 +29,28 @@ const FileChangeList = () => {
 
   const formatDate = (timestamp) => {
     return new Date(timestamp).toLocaleString();
+  };
+
+  const handleDelete = async () => {
+    const changeId = confirmDialog.changeId;
+    setDeleting({ ...deleting, [changeId]: true });
+    try {
+      await deleteFileChange(changeId);
+      setChanges(changes.filter(change => change.id !== changeId));
+    } catch (err) {
+      console.error('Failed to delete file change:', err);
+    } finally {
+      setDeleting({ ...deleting, [changeId]: false });
+      setConfirmDialog({ isOpen: false, changeId: null });
+    }
+  };
+
+  const openConfirmDialog = (changeId) => {
+    setConfirmDialog({ isOpen: true, changeId });
+  };
+
+  const closeConfirmDialog = () => {
+    setConfirmDialog({ isOpen: false, changeId: null });
   };
 
   if (loading) {
@@ -87,14 +112,23 @@ const FileChangeList = () => {
                     {formatDate(change.timestamp)}
                   </p>
                 </div>
-                <span className={`px-3 py-1 rounded text-xs font-medium ${
-                  change.event_type === 'modified' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                  change.event_type === 'created' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                  change.event_type === 'deleted' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                  'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                }`}>
-                  {change.event_type.toUpperCase()}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`px-3 py-1 rounded text-xs font-medium ${
+                    change.event_type === 'modified' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                    change.event_type === 'created' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                    change.event_type === 'deleted' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                  }`}>
+                    {change.event_type.toUpperCase()}
+                  </span>
+                  <button
+                    onClick={() => openConfirmDialog(change.id)}
+                    disabled={deleting[change.id]}
+                    className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-medium disabled:bg-red-400 transition-colors"
+                  >
+                    {deleting[change.id] ? 'Deleting...' : '🗑️ Delete'}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -102,6 +136,16 @@ const FileChangeList = () => {
           </div>
         ))}
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Delete File Change?"
+        message="Are you sure you want to delete this file change? This action cannot be undone."
+        onConfirm={handleDelete}
+        onCancel={closeConfirmDialog}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

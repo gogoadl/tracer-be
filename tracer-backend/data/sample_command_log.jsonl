@@ -1,0 +1,138 @@
+{"timestamp": "2025-10-01T08:30:15", "user": "john", "directory": "~/Documents/project", "command": "cd /home/john/Documents"}
+{"timestamp": "2025-10-01T08:30:45", "user": "john", "directory": "~/Documents/project", "command": "ls -la"}
+{"timestamp": "2025-10-01T08:31:22", "user": "john", "directory": "~/Documents/project", "command": "git status"}
+{"timestamp": "2025-10-01T08:32:10", "user": "john", "directory": "~/Documents/project", "command": "git add ."}
+{"timestamp": "2025-10-01T08:33:05", "user": "john", "directory": "~/Documents/project", "command": "git commit -m \"Initial commit\""}
+{"timestamp": "2025-10-01T09:15:30", "user": "john", "directory": "~/Documents/project", "command": "python -m pip install fastapi"}
+{"timestamp": "2025-10-01T09:16:45", "user": "john", "directory": "~/Documents/project", "command": "python app.py"}
+{"timestamp": "2025-10-01T10:20:12", "user": "john", "directory": "~/Documents/project", "command": "docker build -t myapp ."}
+{"timestamp": "2025-10-01T10:25:33", "user": "john", "directory": "~/Documents/project", "command": "docker run -p 8000:8000 myapp"}
+{"timestamp": "2025-10-02T08:45:10", "user": "mary", "directory": "~/workspace/backend", "command": "cd ~/workspace/backend"}
+{"timestamp": "2025-10-02T08:45:30", "user": "mary", "directory": "~/workspace/backend", "command": "cat requirements.txt"}
+{"timestamp": "2025-10-02T08:46:15", "user": "mary", "directory": "~/workspace/backend", "command": "pip install -r requirements.txt"}
+{"timestamp": "2025-10-02T09:00:22", "user": "mary", "directory": "~/workspace/backend", "command": "git checkout -b feature/auth"}
+{"timestamp": "2025-10-02T09:15:45", "user": "mary", "directory": "~/workspace/backend", "command": "python manage.py migrate"}
+{"timestamp": "2025-10-02T09:30:10", "user": "mary", "directory": "~/workspace/backend", "command": "python manage.py createsuperuser"}
+{"timestamp": "2025-10-02T10:00:33", "user": "mary", "directory": "~/workspace/backend", "command": "pytest tests/"}
+{"timestamp": "2025-10-02T14:30:22", "user": "mary", "directory": "~/workspace/backend", "command": "git push origin feature/auth"}
+{"timestamp": "2025-10-03T11:20:15", "user": "john", "directory": "~/Documents/project", "command": "mkdir src"}
+{"timestamp": "2025-10-03T11:20:45", "user": "john", "directory": "~/Documents/project", "command": "touch src/__init__.py"}
+{"timestamp": "2025-10-03T11:22:10", "user": "john", "directory": "~/Documents/project", "command": "nano src/main.py"}
+{"timestamp": "2025-10-03T11:45:30", "user": "john", "directory": "~/Documents/project", "command": "python src/main.py"}
+{"timestamp": "2025-10-03T12:00:15", "user": "john", "directory": "~/Documents/project", "command": "git add src/"}
+{"timestamp": "2025-10-03T12:01:30", "user": "john", "directory": "~/Documents/project", "command": "git commit -m \"Add src directory\""}
+{"timestamp": "2025-10-04T09:10:22", "user": "admin", "directory": "~/server/logs", "command": "tail -f app.log"}
+{"timestamp": "2025-10-04T09:15:45", "user": "admin", "directory": "~/server/logs", "command": "grep ERROR app.log"}
+{"timestamp": "2025-10-04T09:30:10", "user": "admin", "directory": "~/server/logs", "command": "docker ps"}
+{"timestamp": "2025-10-04T09:35:22", "user": "admin", "directory": "~/server/logs", "command": "docker logs -f mycontainer"}
+{"timestamp": "2025-10-04T10:00:15", "user": "admin", "directory": "~/server/logs", "command": "systemctl status nginx"}
+{"timestamp": "2025-10-04T10:15:30", "user": "admin", "directory": "~/server/logs", "command": "journalctl -u app.service"}
+{"timestamp": "2025-10-05T08:45:00", "user": "john", "directory": "~/Documents/project", "command": "curl http://localhost:8000/api/health"}
+{"timestamp": "2025-10-05T08:46:22", "user": "john", "directory": "~/Documents/project", "command": "curl http://localhost:8000/api/logs"}
+{"timestamp": "2025-10-05T09:00:15", "user": "john", "directory": "~/Documents/project", "command": "python -c \"import sqlalchemy; print(sqlalchemy.__version__)\""}
+{"timestamp": "2025-10-05T09:15:30", "user": "john", "directory": "~/Documents/project", "command": "export DATABASE_URL=sqlite:///./test.db"}
+{"timestamp": "2025-10-05T09:30:45", "user": "john", "directory": "~/Documents/project", "command": "python test_db.py"}
+{"timestamp": "2025-10-06T10:20:15", "user": "mary", "directory": "~/workspace/backend", "command": "git pull origin main"}
+{"timestamp": "2025-10-06T10:25:30", "user": "mary", "directory": "~/workspace/backend", "command": "npm run build"}
+{"timestamp": "2025-10-06T10:40:15", "user": "mary", "directory": "~/workspace/backend", "command": "npm start"}
+{"timestamp": "2025-10-06T11:00:22", "user": "mary", "directory": "~/workspace/backend", "command": "docker-compose up -d"}
+{"timestamp": "2025-10-06T11:15:45", "user": "mary", "directory": "~/workspace/backend", "command": "kubectl get pods"}
+{"timestamp": "2025-10-06T14:30:10", "user": "mary", "directory": "~/workspace/backend", "command": "kubectl logs deployment/backend"}
+{"timestamp": "2025-10-07T09:00:15", "user": "john", "directory": "~/Documents/project", "command": "python -m pytest tests/test_api.py"}
+{"timestamp": "2025-10-07T09:15:30", "user": "john", "directory": "~/Documents/project", "command": "coverage run -m pytest"}
+{"timestamp": "2025-10-07T09:30:45", "user": "john", "directory": "~/Documents/project", "command": "coverage report"}
+{"timestamp": "2025-10-07T10:00:22", "user": "john", "directory": "~/Documents/project", "command": "black src/"}
+{"timestamp": "2025-10-07T10:15:10", "user": "john", "directory": "~/Documents/project", "command": "flake8 src/"}
+{"timestamp": "2025-10-08T08:30:15", "user": "admin", "directory": "~/server/logs", "command": "df -h"}
+{"timestamp": "2025-10-08T08:45:30", "user": "admin", "directory": "~/server/logs", "command": "free -m"}
+{"timestamp": "2025-10-08T09:00:15", "user": "admin", "directory": "~/server/logs", "command": "top"}
+{"timestamp": "2025-10-08T09:30:45", "user": "admin", "directory": "~/server/logs", "command": "netstat -tulpn | grep 8000"}
+{"timestamp": "2025-10-08T10:15:22", "user": "admin", "directory": "~/server/logs", "command": "iptables -L"}
+{"timestamp": "2025-10-09T11:00:15", "user": "john", "directory": "~/Documents/project", "command": "git log --oneline"}
+{"timestamp": "2025-10-09T11:15:30", "user": "john", "directory": "~/Documents/project", "command": "git diff HEAD~1"}
+{"timestamp": "2025-10-09T11:30:45", "user": "john", "directory": "~/Documents/project", "command": "git stash"}
+{"timestamp": "2025-10-09T12:00:15", "user": "john", "directory": "~/Documents/project", "command": "git checkout -b fix/bug-123"}
+{"timestamp": "2025-10-09T14:00:30", "user": "john", "directory": "~/Documents/project", "command": "git push origin fix/bug-123"}
+{"timestamp": "2025-10-10T09:15:22", "user": "mary", "directory": "~/workspace/backend", "command": "cat .env"}
+{"timestamp": "2025-10-10T09:30:45", "user": "mary", "directory": "~/workspace/backend", "command": "source venv/bin/activate"}
+{"timestamp": "2025-10-10T09:45:15", "user": "mary", "directory": "~/workspace/backend", "command": "alembic upgrade head"}
+{"timestamp": "2025-10-10T10:00:30", "user": "mary", "directory": "~/workspace/backend", "command": "psql -U postgres -d app_db"}
+{"timestamp": "2025-10-10T10:30:15", "user": "mary", "directory": "~/workspace/backend", "command": "redis-cli ping"}
+{"timestamp": "2025-10-11T08:45:22", "user": "john", "directory": "~/Documents/project", "command": "virtualenv venv"}
+{"timestamp": "2025-10-11T09:00:15", "user": "john", "directory": "~/Documents/project", "command": "source venv/bin/activate"}
+{"timestamp": "2025-10-11T09:15:30", "user": "john", "directory": "~/Documents/project", "command": "pip install flask"}
+{"timestamp": "2025-10-11T09:30:45", "user": "john", "directory": "~/Documents/project", "command": "python -m pip install uvicorn"}
+{"timestamp": "2025-10-11T10:00:22", "user": "john", "directory": "~/Documents/project", "command": "uvicorn main:app --reload"}
+{"timestamp": "2025-10-12T10:30:15", "user": "admin", "directory": "~/server/logs", "command": "ls -lh /var/log/"}
+{"timestamp": "2025-10-12T10:45:30", "user": "admin", "directory": "~/server/logs", "command": "journalctl -u docker --since today"}
+{"timestamp": "2025-10-12T11:00:15", "user": "admin", "directory": "~/server/logs", "command": "docker system prune -f"}
+{"timestamp": "2025-10-12T11:30:45", "user": "admin", "directory": "~/server/logs", "command": "certbot renew"}
+{"timestamp": "2025-10-13T09:00:22", "user": "john", "directory": "~/Documents/project", "command": "python -m http.server 8080"}
+{"timestamp": "2025-10-13T09:15:45", "user": "john", "directory": "~/Documents/project", "command": "ngrok http 8080"}
+{"timestamp": "2025-10-13T09:30:30", "user": "john", "directory": "~/Documents/project", "command": "curl https://api.example.com/data"}
+{"timestamp": "2025-10-13T10:00:15", "user": "john", "directory": "~/Documents/project", "command": "jq '.' response.json"}
+{"timestamp": "2025-10-14T10:30:22", "user": "mary", "directory": "~/workspace/backend", "command": "npm run lint"}
+{"timestamp": "2025-10-14T10:45:15", "user": "mary", "directory": "~/workspace/backend", "command": "npm run test"}
+{"timestamp": "2025-10-14T11:00:30", "user": "mary", "directory": "~/workspace/backend", "command": "eslint src/"}
+{"timestamp": "2025-10-14T11:30:45", "user": "mary", "directory": "~/workspace/backend", "command": "prettier --write \"**/*.{js,ts}\""}
+{"timestamp": "2025-10-15T08:45:15", "user": "admin", "directory": "~/server/logs", "command": "ssh user@remote-server"}
+{"timestamp": "2025-10-15T09:00:30", "user": "admin", "directory": "~/server/logs", "command": "rsync -avz /backup/ user@remote:/backup/"}
+{"timestamp": "2025-10-15T09:30:15", "user": "admin", "directory": "~/server/logs", "command": "scp file.txt user@remote:/tmp/"}
+{"timestamp": "2025-10-15T10:00:45", "user": "admin", "directory": "~/server/logs", "command": "crontab -l"}
+{"timestamp": "2025-10-15T10:30:22", "user": "admin", "directory": "~/server/logs", "command": "systemctl list-units --type=service"}
+{"timestamp": "2025-10-16T09:15:30", "user": "john", "directory": "~/Documents/project", "command": "git tag v1.0.0"}
+{"timestamp": "2025-10-16T09:30:45", "user": "john", "directory": "~/Documents/project", "command": "git push origin v1.0.0"}
+{"timestamp": "2025-10-16T10:00:15", "user": "john", "directory": "~/Documents/project", "command": "git checkout main"}
+{"timestamp": "2025-10-16T10:15:30", "user": "john", "directory": "~/Documents/project", "command": "git merge develop"}
+{"timestamp": "2025-10-16T10:30:45", "user": "john", "directory": "~/Documents/project", "command": "git push origin main"}
+{"timestamp": "2025-10-17T11:00:22", "user": "mary", "directory": "~/workspace/backend", "command": "docker build --no-cache -t backend:v2 ."}
+{"timestamp": "2025-10-17T11:15:45", "user": "mary", "directory": "~/workspace/backend", "command": "docker run -d -p 8080:8080 backend:v2"}
+{"timestamp": "2025-10-17T11:30:30", "user": "mary", "directory": "~/workspace/backend", "command": "docker exec -it backend_container bash"}
+{"timestamp": "2025-10-17T12:00:15", "user": "mary", "directory": "~/workspace/backend", "command": "kubectl apply -f k8s/deployment.yaml"}
+{"timestamp": "2025-10-18T08:30:45", "user": "admin", "directory": "~/server/logs", "command": "grep -r \"error\" /var/log/"}
+{"timestamp": "2025-10-18T08:45:30", "user": "admin", "directory": "~/server/logs", "command": "find /var/log -name \"*.log\" -mtime -1"}
+{"timestamp": "2025-10-18T09:15:15", "user": "admin", "directory": "~/server/logs", "command": "tar -czf logs_backup.tar.gz /var/log/"}
+{"timestamp": "2025-10-18T10:00:22", "user": "admin", "directory": "~/server/logs", "command": "aws s3 cp logs_backup.tar.gz s3://backups/"}
+{"timestamp": "2025-10-19T09:00:15", "user": "john", "directory": "~/Documents/project", "command": "poetry add pytest"}
+{"timestamp": "2025-10-19T09:15:30", "user": "john", "directory": "~/Documents/project", "command": "poetry install"}
+{"timestamp": "2025-10-19T09:30:45", "user": "john", "directory": "~/Documents/project", "command": "poetry run pytest"}
+{"timestamp": "2025-10-19T10:00:22", "user": "john", "directory": "~/Documents/project", "command": "poetry build"}
+{"timestamp": "2025-10-20T09:30:15", "user": "mary", "directory": "~/workspace/backend", "command": "npm outdated"}
+{"timestamp": "2025-10-20T09:45:30", "user": "mary", "directory": "~/workspace/backend", "command": "npm update"}
+{"timestamp": "2025-10-20T10:15:45", "user": "mary", "directory": "~/workspace/backend", "command": "npm audit fix"}
+{"timestamp": "2025-10-20T11:00:22", "user": "mary", "directory": "~/workspace/backend", "command": "yarn upgrade"}
+{"timestamp": "2025-10-21T08:00:15", "user": "admin", "directory": "~/server/logs", "command": "du -sh /var/*"}
+{"timestamp": "2025-10-21T08:15:30", "user": "admin", "directory": "~/server/logs", "command": "lsof -i :8000"}
+{"timestamp": "2025-10-21T08:30:45", "user": "admin", "directory": "~/server/logs", "command": "netstat -ano | grep :3306"}
+{"timestamp": "2025-10-21T09:00:22", "user": "admin", "directory": "~/server/logs", "command": "systemctl restart nginx"}
+{"timestamp": "2025-10-22T09:45:15", "user": "john", "directory": "~/Documents/project", "command": "cp config.example.json config.json"}
+{"timestamp": "2025-10-22T10:00:30", "user": "john", "directory": "~/Documents/project", "command": "sed -i 's/localhost/127.0.0.1/g' config.json"}
+{"timestamp": "2025-10-22T10:30:45", "user": "john", "directory": "~/Documents/project", "command": "cat config.json | jq '.database'"}
+{"timestamp": "2025-10-22T11:00:15", "user": "john", "directory": "~/Documents/project", "command": "rm -rf node_modules/"}
+{"timestamp": "2025-10-22T11:15:30", "user": "john", "directory": "~/Documents/project", "command": "npm install --save-dev jest"}
+{"timestamp": "2025-10-23T10:00:22", "user": "mary", "directory": "~/workspace/backend", "command": "composer install"}
+{"timestamp": "2025-10-23T10:15:45", "user": "mary", "directory": "~/workspace/backend", "command": "php artisan migrate"}
+{"timestamp": "2025-10-23T10:30:30", "user": "mary", "directory": "~/workspace/backend", "command": "php artisan db:seed"}
+{"timestamp": "2025-10-23T11:00:15", "user": "mary", "directory": "~/workspace/backend", "command": "php artisan serve"}
+{"timestamp": "2025-10-24T08:30:22", "user": "admin", "directory": "~/server/logs", "command": "htop"}
+{"timestamp": "2025-10-24T08:45:45", "user": "admin", "directory": "~/server/logs", "command": "iostat -x 1"}
+{"timestamp": "2025-10-24T09:15:30", "user": "admin", "directory": "~/server/logs", "command": "vmstat 1"}
+{"timestamp": "2025-10-24T10:00:15", "user": "admin", "directory": "~/server/logs", "command": "sar -u 1"}
+{"timestamp": "2025-10-25T09:45:22", "user": "john", "directory": "~/Documents/project", "command": "npm run dev"}
+{"timestamp": "2025-10-25T10:00:45", "user": "john", "directory": "~/Documents/project", "command": "webpack --mode production"}
+{"timestamp": "2025-10-25T10:30:30", "user": "john", "directory": "~/Documents/project", "command": "npm run build"}
+{"timestamp": "2025-10-25T11:00:15", "user": "john", "directory": "~/Documents/project", "command": "npx serve build/"}
+{"timestamp": "2025-10-26T10:15:30", "user": "mary", "directory": "~/workspace/backend", "command": "terraform init"}
+{"timestamp": "2025-10-26T10:30:45", "user": "mary", "directory": "~/workspace/backend", "command": "terraform plan"}
+{"timestamp": "2025-10-26T11:00:22", "user": "mary", "directory": "~/workspace/backend", "command": "terraform apply"}
+{"timestamp": "2025-10-26T11:30:15", "user": "mary", "directory": "~/workspace/backend", "command": "aws ec2 describe-instances"}
+{"timestamp": "2025-10-27T08:00:30", "user": "admin", "directory": "~/server/logs", "command": "ufw status"}
+{"timestamp": "2025-10-27T08:15:45", "user": "admin", "directory": "~/server/logs", "command": "fail2ban-client status sshd"}
+{"timestamp": "2025-10-27T08:30:22", "user": "admin", "directory": "~/server/logs", "command": "systemctl status fail2ban"}
+{"timestamp": "2025-10-27T09:00:15", "user": "admin", "directory": "~/server/logs", "command": "ssh-keygen -t rsa"}
+{"timestamp": "2025-10-27T09:15:30", "user": "admin", "directory": "~/server/logs", "command": "ssh-copy-id user@remote-server"}
+{"timestamp": "2025-10-27T09:30:45", "user": "john", "directory": "~/Documents/project", "command": "git fetch origin"}
+{"timestamp": "2025-10-27T09:45:15", "user": "john", "directory": "~/Documents/project", "command": "git merge origin/main"}
+{"timestamp": "2025-10-27T10:00:30", "user": "john", "directory": "~/Documents/project", "command": "git push"}
+{"timestamp": "2025-10-27T10:15:22", "user": "john", "directory": "~/Documents/project", "command": "git log --graph --oneline --all"}
+{"timestamp": "2025-10-27T10:30:45", "user": "john", "directory": "~/Documents/project", "command": "git branch -a"}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import CustomSelect from './CustomSelect';
 
 const LogFilters = ({ onFilterChange, users, directories }) => {
   const { t } = useLanguage();
@@ -44,18 +45,14 @@ const LogFilters = ({ onFilterChange, users, directories }) => {
             👤 {t('user')}
           </label>
           {users && users.length > 0 ? (
-            <select
+            <CustomSelect
+              options={[{ value: '', label: t('allUsers') }, ...users.map(user => ({ value: user, label: user }))]}
               value={filters.user}
-              onChange={(e) => handleFilterChange('user', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">{t('allUsers')}</option>
-              {users.map((user) => (
-                <option key={user} value={user}>
-                  {user}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => handleFilterChange('user', value)}
+              placeholder={t('allUsers')}
+              searchable={true}
+              className="w-full"
+            />
           ) : (
             <input
               type="text"
@@ -87,18 +84,17 @@ const LogFilters = ({ onFilterChange, users, directories }) => {
             📁 {t('directory')}
           </label>
           {directories && directories.length > 0 ? (
-            <select
+            <CustomSelect
+              options={[
+                { value: '', label: t('allDirectories') },
+                ...directories.map(dir => ({ value: dir, label: dir.length > 40 ? '...' + dir.slice(-37) : dir }))
+              ]}
               value={filters.directory}
-              onChange={(e) => handleFilterChange('directory', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">{t('allDirectories')}</option>
-              {directories.map((dir) => (
-                <option key={dir} value={dir}>
-                  {dir.length > 40 ? '...' + dir.slice(-37) : dir}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => handleFilterChange('directory', value)}
+              placeholder={t('allDirectories')}
+              searchable={true}
+              className="w-full"
+            />
           ) : (
             <input
               type="text"

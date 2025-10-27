@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from './contexts/LanguageContext';
+import { useAlert } from './components/AlertContext';
 import Sidebar from './components/Sidebar';
 import SummaryCard from './components/SummaryCard';
 import LogEntry from './components/LogEntry';
@@ -10,10 +11,13 @@ import FileChangeChart from './components/FileChangeChart';
 import FileChangeList from './components/FileChangeList';
 import CommandLogChart from './components/CommandLogChart';
 import LogFilters from './components/LogFilters';
-import { fetchDates, fetchLogsByDate, fetchLogsWithFilters, analyzeLogs, fetchLogFilterOptions } from './api';
+import ConfigSettings from './components/ConfigSettings';
+import CustomSelect from './components/CustomSelect';
+import { fetchDates, fetchLogsByDate, fetchLogsWithFilters, analyzeLogs, fetchLogFilterOptions, refreshLogsFromFile } from './api';
 
 function App() {
   const { t, language } = useLanguage();
+  const { success: showSuccess, error: showError } = useAlert();
   const [dates, setDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [logs, setLogs] = useState([]);
@@ -41,6 +45,16 @@ function App() {
     loadDates();
     loadFilterOptions();
   }, []);
+
+  // Listen for logs reloaded event
+  useEffect(() => {
+    const handleLogsReloaded = () => {
+      reloadLogsAfterConfig();
+    };
+    
+    window.addEventListener('logsReloaded', handleLogsReloaded);
+    return () => window.removeEventListener('logsReloaded', handleLogsReloaded);
+  }, [selectedDate]);
 
   const loadFilterOptions = async () => {
     try {
@@ -83,6 +97,36 @@ function App() {
       console.error('Error loading logs:', error);
       setLogs([]);
       setSummary('');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const reloadLogsAfterConfig = async () => {
+    try {
+      await loadDates();
+      if (selectedDate) {
+        await loadLogs(selectedDate);
+      }
+    } catch (error) {
+      console.error('Error reloading after config:', error);
+    }
+  };
+
+  const handleReloadLogs = async () => {
+    try {
+      setIsLoading(true);
+      const result = await refreshLogsFromFile();
+      showSuccess(result?.message || 'Logs reloaded successfully');
+      
+      // Reload dates and current logs
+      await loadDates();
+      if (selectedDate) {
+        await loadLogs(selectedDate);
+      }
+    } catch (error) {
+      console.error('Error reloading logs:', error);
+      showError(error.response?.data?.detail || 'Failed to reload logs from file');
     } finally {
       setIsLoading(false);
     }
@@ -179,20 +223,30 @@ function App() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {t('selectDate')}
                   </label>
-                  <select
+                  <CustomSelect
+                    options={dates.map(date => ({ value: date, label: date }))}
                     value={selectedDate || ''}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 w-full md:w-64"
-                  >
-                    <option value="">{language === 'en' ? 'Select a date...' : '날짜를 선택하세요...'}</option>
-                    {dates.map(date => (
-                      <option key={date} value={date}>{date}</option>
-                    ))}
-                  </select>
+                    onChange={setSelectedDate}
+                    placeholder={language === 'en' ? 'Select a date...' : '날짜를 선택하세요...'}
+                    searchable={true}
+                    icon="📅"
+                    className="w-full md:w-80"
+                  />
                 </div>
 
                 {selectedDate ? (
                   <>
+                    {/* Reload Button */}
+                    <div className="mb-4 flex justify-end">
+                      <button
+                        onClick={handleReloadLogs}
+                        disabled={isLoading}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg disabled:bg-green-400 transition-colors font-medium text-sm"
+                      >
+                        {isLoading ? '⏳ Reloading...' : '🔄 Reload from File'}
+                      </button>
+                    </div>
+
                     {/* Filters */}
                     <LogFilters
                       onFilterChange={handleFilterChange}
@@ -244,6 +298,8 @@ function App() {
               <FolderWatcher />
             ) : activeMenu === 'changes' ? (
               <FileChangeList />
+            ) : activeMenu === 'config' ? (
+              <ConfigSettings />
             ) : null}
           </main>
         </div>

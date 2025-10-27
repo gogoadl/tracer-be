@@ -11,16 +11,23 @@ def setup_sample_data():
     # Get the home directory
     home_dir = Path.home()
     
-    # Path to sample file
-    sample_file = Path(__file__).parent / "data" / "sample_command_history.txt"
+    # Path to sample files
+    jsonl_file = Path(__file__).parent / "data" / "sample_command_log.jsonl"
+    text_file = Path(__file__).parent / "data" / "sample_command_history.txt"
     
-    # Destination: ~/.command_history
-    dest_file = home_dir / ".command_history"
+    # Destination: ~/.command_log.jsonl
+    dest_file = home_dir / ".command_log.jsonl"
+    
+    # Try JSONL first, fall back to text if not available
+    sample_file = jsonl_file if jsonl_file.exists() else text_file
     
     # Check if sample file exists
     if not sample_file.exists():
         print(f"❌ Sample file not found at: {sample_file}")
-        return
+        print("Creating JSONL from text file...")
+        from create_sample_jsonl import create_sample_jsonl
+        create_sample_jsonl()
+        sample_file = jsonl_file
     
     # Copy the file
     try:

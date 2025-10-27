@@ -8,6 +8,7 @@ export const translations = {
     logs: { label: "Command Logs", name: "Command Logs" },
     watcher: { label: "File Watcher", name: "File Watcher" },
     changes: { label: "File Changes", name: "File Changes" },
+    config: { label: "Configuration", name: "Settings" },
     
     // Dashboard
     commandLogAnalytics: "Command Log Analytics",
@@ -91,6 +92,18 @@ export const translations = {
     back: "Back",
     next: "Next",
     previous: "Previous",
+    
+    // Config Settings
+    configurationSettings: "Configuration Settings",
+    currentConfiguration: "Current Configuration",
+    logFilePath: "Log File Path",
+    fileStatus: "File Status",
+    updateConfiguration: "Update Configuration",
+    testPath: "Test Path",
+    saveConfiguration: "Save Configuration",
+    saving: "Saving...",
+    reloadLogs: "Reload Logs from File",
+    reloading: "Reloading...",
   },
   
   ko: {
@@ -102,6 +115,7 @@ export const translations = {
     logs: { label: "커맨드 로그", name: "Command Logs" },
     watcher: { label: "파일 워처", name: "File Watcher" },
     changes: { label: "파일 변경사항", name: "File Changes" },
+    config: { label: "설정", name: "Settings" },
     
     // Dashboard
     commandLogAnalytics: "커맨드 로그 분석",
@@ -185,6 +199,18 @@ export const translations = {
     back: "뒤로",
     next: "다음",
     previous: "이전",
+    
+    // Config Settings
+    configurationSettings: "설정",
+    currentConfiguration: "현재 설정",
+    logFilePath: "로그 파일 경로",
+    fileStatus: "파일 상태",
+    updateConfiguration: "설정 업데이트",
+    testPath: "경로 테스트",
+    saveConfiguration: "설정 저장",
+    saving: "저장 중...",
+    reloadLogs: "파일에서 로그 다시 불러오기",
+    reloading: "불러오는 중...",
   }
 };
 

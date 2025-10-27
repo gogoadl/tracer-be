@@ -60,13 +60,20 @@ uvicorn main:app --reload
 
 ### 1. Install Command Logger (Linux only)
 
+리눅스 환경에서 자동 명령어 로깅을 설정:
+
 ```bash
 cd tracer-backend
 chmod +x install_logger.sh
 ./install_logger.sh
 ```
 
-이 명령어는 자동으로 명령어 로깅을 설정합니다. 자세한 내용은 [README_COMMAND_LOGGER.md](./README_COMMAND_LOGGER.md)를 참조하세요.
+이 스크립트는:
+- `~/.command_history` 파일 생성
+- Shell 설정 파일(`~/.bashrc` 또는 `~/.zshrc`)에 로깅 스크립트 추가
+- 백엔드가 자동으로 이 파일을 읽어서 데이터베이스에 저장
+
+자세한 내용은 [README_COMMAND_LOGGER.md](./README_COMMAND_LOGGER.md)를 참조하세요.
 
 ### 2. Run Backend
 

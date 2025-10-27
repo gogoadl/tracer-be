@@ -56,7 +56,7 @@ async def get_logs(
     # Get total count
     total = query.count()
     
-    # Apply pagination
+    # Apply pagination - latest first
     logs = query.order_by(CommandLog.timestamp.desc()).offset(offset).limit(limit).all()
     
     return {
@@ -174,7 +174,7 @@ async def get_logs_for_date(
             CommandLog.timestamp >= start_dt,
             CommandLog.timestamp < datetime.combine(date_obj, datetime.max.time()) + timedelta(days=1)
         )
-    ).order_by(CommandLog.timestamp.asc()).all()
+    ).order_by(CommandLog.timestamp.desc()).all()  # Show latest first
     
     return {
         "date": date,
@@ -188,23 +188,35 @@ async def refresh_logs(
     db: Session = Depends(get_db)
 ):
     """
-    Manually refresh logs from ~/.command_history
+    Manually refresh logs from command history file
     """
     from pathlib import Path
+    import os
     
-    command_history_path = Path.home() / ".command_history"
-    
-    if not command_history_path.exists():
-        raise HTTPException(status_code=404, detail="Command history file not found")
+    # Get command history path from config (same logic as main.py)
+    from main import load_config, get_command_history_path
     
     try:
+        command_history_path = get_command_history_path()
+        
+        if not command_history_path.exists():
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Command history file not found at {command_history_path}. Please check the file path in Configuration settings."
+            )
+        
+        # Load logs from file
         from main import load_logs_from_file
         load_logs_from_file(db, command_history_path)
         db.commit()
+        
         return {
             "message": "Logs refreshed successfully",
-            "source": str(command_history_path)
+            "source": str(command_history_path),
+            "path": str(command_history_path)
         }
+    except HTTPException:
+        raise
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error refreshing logs: {str(e)}")

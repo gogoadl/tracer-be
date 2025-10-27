@@ -11,7 +11,7 @@ echo "============================================"
 echo ""
 
 # Configuration
-LOG_FILE="$HOME/.command_history"
+LOG_FILE="$HOME/.command_log.jsonl"
 CONFIG_DIR="$HOME/.config/tracer"
 INSTALL_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
@@ -27,8 +27,8 @@ cat > "$CONFIG_DIR/command_logger.sh" << 'LOGGER_EOF'
 #!/bin/bash
 # Tracer Command Logger
 
-LOG_FILE="$HOME/.command_history"
-TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+LOG_FILE="$HOME/.command_log.jsonl"
+TIMESTAMP=$(date -Iseconds)
 USERNAME=$(whoami)
 DIR=$(pwd)
 COMMAND=$(history 1 | sed 's/^[ ]*[0-9]*[ ]*//')
@@ -38,8 +38,13 @@ if [ -z "$COMMAND" ] || [[ "$COMMAND" == *"command_logger.sh"* ]] || [[ "$COMMAN
     return
 fi
 
-# Log format: YYYY-MM-DD HH:MM:SS [user] ~/path: command
-echo "$TIMESTAMP [$USERNAME] $DIR: $COMMAND" >> "$LOG_FILE"
+# Create JSON object for this command
+# Escape the command for JSON
+ESCAPED_COMMAND=$(echo "$COMMAND" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
+ESCAPED_DIR=$(echo "$DIR" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
+
+# Log as JSON Lines format
+echo "{\"timestamp\":\"$TIMESTAMP\",\"user\":\"$USERNAME\",\"directory\":\"$ESCAPED_DIR\",\"command\":\"$ESCAPED_COMMAND\"}" >> "$LOG_FILE"
 
 # Keep log file size manageable (optional: keep last 10,000 lines)
 tail -n 10000 "$LOG_FILE" > "$LOG_FILE.tmp" && mv "$LOG_FILE.tmp" "$LOG_FILE"

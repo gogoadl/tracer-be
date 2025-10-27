@@ -227,6 +227,28 @@ async def get_changes_by_date(
     }
 
 
+@router.delete("/changes/{change_id}")
+async def delete_file_change(
+    change_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Delete a file change record
+    """
+    change = db.query(FileChange).filter(FileChange.id == change_id).first()
+    
+    if not change:
+        raise HTTPException(status_code=404, detail="File change not found")
+    
+    db.delete(change)
+    db.commit()
+    
+    return {
+        "message": "File change deleted successfully",
+        "id": change_id
+    }
+
+
 @router.get("/changes/stats")
 async def get_file_change_stats(
     db: Session = Depends(get_db)

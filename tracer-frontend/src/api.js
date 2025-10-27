@@ -138,6 +138,16 @@ export const analyzeLogs = async (date) => {
   }
 };
 
+export const refreshLogsFromFile = async () => {
+  try {
+    const response = await api.post('/api/logs/refresh');
+    return response.data;
+  } catch (error) {
+    console.error('Error refreshing logs:', error);
+    throw error;
+  }
+};
+
 // File Watch APIs
 export const fetchWatchFolders = async () => {
   try {
@@ -226,6 +236,16 @@ export const fetchLogFilterOptions = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching filter options:', error);
+    throw error;
+  }
+};
+
+export const deleteFileChange = async (changeId) => {
+  try {
+    const response = await api.delete(`/api/changes/${changeId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting file change:', error);
     throw error;
   }
 };

@@ -9,12 +9,16 @@ echo.
 REM Activate virtual environment
 call venv\Scripts\activate.bat
 
-REM Setup sample data if ~/.command_history doesn't exist
-if not exist "%HOME%\.command_history" (
-    echo Setting up sample data...
-    python setup_sample_data.py
+REM Setup sample data if ~/.command_log.jsonl doesn't exist
+if not exist "%HOME%\.command_log.jsonl" (
+    if not exist "%HOME%\.command_history" (
+        echo Setting up sample data...
+        python setup_sample_data.py
+    ) else (
+        echo Using existing ~/.command_history
+    )
 ) else (
-    echo Using existing ~/.command_history
+    echo Using existing ~/.command_log.jsonl
 )
 
 REM Navigate to app directory

@@ -17,13 +17,23 @@ const LogEntry = ({ entry, index }) => {
         </div>
       </div>
       
-      <div className="mb-2">
-        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 mr-2">
-          Directory:
-        </span>
-        <span className="text-sm text-gray-900 dark:text-gray-100 font-mono bg-gray-200 dark:bg-gray-800 px-2 py-1 rounded">
-          {entry.working_directory || 'N/A'}
-        </span>
+      <div className="mb-2 flex flex-wrap gap-3">
+        <div>
+          <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 mr-1">
+            User:
+          </span>
+          <span className="text-xs text-gray-900 dark:text-gray-100 font-mono bg-purple-100 dark:bg-purple-900 px-2 py-1 rounded">
+            {entry.user || 'N/A'}
+          </span>
+        </div>
+        <div>
+          <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 mr-1">
+            Directory:
+          </span>
+          <span className="text-xs text-gray-900 dark:text-gray-100 font-mono bg-gray-200 dark:bg-gray-800 px-2 py-1 rounded">
+            {entry.working_directory || 'N/A'}
+          </span>
+        </div>
       </div>
       
       <div className="mt-3">

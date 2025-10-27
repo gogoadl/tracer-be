@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useAlert } from './AlertContext';
+import ConfirmDialog from './ConfirmDialog';
 import { fetchWatchFolders, addWatchFolder, removeWatchFolder, toggleWatchFolder } from '../api';
 
 const FolderWatcher = () => {
+  const { success: showSuccess, error: showError } = useAlert();
   const [folders, setFolders] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState({
@@ -9,6 +12,7 @@ const FolderWatcher = () => {
     filePatterns: '',
     recursive: true
   });
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, folderId: null });
 
   useEffect(() => {
     loadFolders();
@@ -34,19 +38,22 @@ const FolderWatcher = () => {
       await loadFolders();
       setFormData({ path: '', filePatterns: '', recursive: true });
       setIsAdding(false);
+      showSuccess('Folder added successfully!');
     } catch (error) {
-      alert('Failed to add folder: ' + error.message);
+      showError('Failed to add folder: ' + error.message);
     }
   };
 
-  const handleRemove = async (folderId) => {
-    if (!confirm('Remove this folder from watch list?')) return;
-    
+  const handleRemove = async () => {
+    const folderId = confirmDialog.folderId;
     try {
       await removeWatchFolder(folderId);
       await loadFolders();
+      showSuccess('Folder removed successfully!');
     } catch (error) {
-      alert('Failed to remove folder: ' + error.message);
+      showError('Failed to remove folder: ' + error.message);
+    } finally {
+      setConfirmDialog({ isOpen: false, folderId: null });
     }
   };
 
@@ -54,9 +61,18 @@ const FolderWatcher = () => {
     try {
       await toggleWatchFolder(folderId);
       await loadFolders();
+      showSuccess('Folder status updated successfully!');
     } catch (error) {
-      alert('Failed to toggle folder: ' + error.message);
+      showError('Failed to toggle folder: ' + error.message);
     }
+  };
+
+  const openConfirmDialog = (folderId) => {
+    setConfirmDialog({ isOpen: true, folderId });
+  };
+
+  const closeConfirmDialog = () => {
+    setConfirmDialog({ isOpen: false, folderId: null });
   };
 
   return (
@@ -178,7 +194,7 @@ const FolderWatcher = () => {
                   </button>
                   
                   <button
-                    onClick={() => handleRemove(folder.id)}
+                    onClick={() => openConfirmDialog(folder.id)}
                     className="px-3 py-1 rounded text-sm bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-900 dark:hover:bg-red-800 dark:text-red-200 transition-colors"
                   >
                     Remove
@@ -189,6 +205,16 @@ const FolderWatcher = () => {
           ))
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Remove Watched Folder?"
+        message="Are you sure you want to remove this folder from the watch list?"
+        onConfirm={handleRemove}
+        onCancel={closeConfirmDialog}
+        confirmText="Remove"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

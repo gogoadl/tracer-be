@@ -8,6 +8,7 @@ const Sidebar = ({ onMenuSelect, activeMenu }) => {
     { id: 'logs', icon: '📝', labelKey: 'logs' },
     { id: 'watcher', icon: '📁', labelKey: 'watcher' },
     { id: 'changes', icon: '🔄', labelKey: 'changes' },
+    { id: 'config', icon: '⚙️', labelKey: 'config' },
   ];
 
   return (

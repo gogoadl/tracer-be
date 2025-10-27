@@ -25,7 +25,8 @@ const CommandLogChart = () => {
       
       const filteredDates = dates
         .filter(date => new Date(date) >= cutoffDate)
-        .slice(-days);
+        .slice(-days)
+        .reverse(); // Reverse to show newest first
 
       // Fetch logs for each date
       const logsByDate = [];

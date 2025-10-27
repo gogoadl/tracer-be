@@ -31,7 +31,8 @@ const FileChangeChart = () => {
       
       const filteredDates = dateData
         .filter(item => new Date(item.date) >= cutoffDate)
-        .slice(-days);
+        .slice(-days)
+        .reverse(); // Reverse to show newest first
       
       setChangesByDate(filteredDates);
     } catch (error) {

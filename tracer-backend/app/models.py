@@ -68,31 +68,67 @@ class WatchFolder(Base):
 
 def parse_command_line(line: str) -> dict:
     """
-    Parse a line from ~/.command_history
+    Parse a line from command log file
     
-    Format: 2025-10-27 09:15:22 [user] ~/project: ls
+    Supported formats:
+    1. JSON Lines (.command_log.jsonl):
+       {"timestamp": "2025-01-15T10:30:45", "user": "user", "directory": "~/project", "command": "ls"}
+    
+    2. Plain text (.command_history):
+       2025-01-15 10:30:45 [user] ~/project: ls
     """
-    # Pattern to match: date time [user] directory: command
-    pattern = r'(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})\s+\[([^\]]+)\]\s+(.*?):\s+(.+)$'
-    
-    match = re.match(pattern, line.strip())
-    if not match:
+    line = line.strip()
+    if not line:
         return None
     
-    date_str, time_str, user, directory, command = match.groups()
+    # Try to parse as JSON Lines
+    if line.startswith('{'):
+        try:
+            import json
+            data = json.loads(line)
+            
+            # Parse timestamp
+            if isinstance(data.get('timestamp'), str):
+                timestamp = datetime.fromisoformat(data['timestamp'].replace('Z', '+00:00'))
+            elif 'date' in data and 'time' in data:
+                timestamp_str = f"{data['date']} {data['time']}"
+                timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+            else:
+                timestamp = datetime.now()
+            
+            return {
+                "timestamp": timestamp,
+                "date": timestamp.strftime("%Y-%m-%d"),
+                "time": timestamp.strftime("%H:%M:%S"),
+                "user": data.get('user', data.get('username', 'unknown')),
+                "directory": data.get('directory', data.get('cwd', '')),
+                "command": data.get('command', ''),
+                "raw_line": line
+            }
+        except (json.JSONDecodeError, ValueError) as e:
+            print(f"Error parsing JSON line: {e}")
+            return None
     
-    # Parse the full timestamp
-    timestamp_str = f"{date_str} {time_str}"
-    timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+    # Try to parse as plain text format
+    pattern = r'(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})\s+\[([^\]]+)\]\s+(.*?):\s+(.+)$'
+    match = re.match(pattern, line)
+    if match:
+        date_str, time_str, user, directory, command = match.groups()
+        
+        # Parse the full timestamp
+        timestamp_str = f"{date_str} {time_str}"
+        timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+        
+        return {
+            "timestamp": timestamp,
+            "date": date_str,
+            "time": time_str,
+            "user": user,
+            "directory": directory,
+            "command": command,
+            "raw_line": line
+        }
     
-    return {
-        "timestamp": timestamp,
-        "date": date_str,
-        "time": time_str,
-        "user": user,
-        "directory": directory,
-        "command": command,
-        "raw_line": line.strip()
-    }
+    return None
 
 
