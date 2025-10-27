@@ -2,7 +2,7 @@
 REM Start Backend Server with Sample Data
 
 echo ========================================
-echo  AI Log Backend - Starting Server
+echo  Tracer Backend - Starting Server
 echo ========================================
 echo.
 

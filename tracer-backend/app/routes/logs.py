@@ -16,6 +16,7 @@ async def get_logs(
     end_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)"),
     user: Optional[str] = Query(None, description="Filter by user"),
     search: Optional[str] = Query(None, description="Search in commands"),
+    directory: Optional[str] = Query(None, description="Filter by directory"),
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db)
@@ -43,6 +44,10 @@ async def get_logs(
     # User filter
     if user:
         query = query.filter(CommandLog.user == user)
+    
+    # Directory filter
+    if directory:
+        query = query.filter(CommandLog.directory.contains(directory))
     
     # Search filter
     if search:
@@ -125,6 +130,27 @@ async def get_log_stats(
             {"command": cmd[:50], "count": count}  # Truncate long commands
             for cmd, count in top_commands
         ]
+    }
+
+
+@router.get("/logs/filter-options")
+async def get_filter_options(
+    db: Session = Depends(get_db)
+):
+    """
+    Get available filter options (users, directories)
+    """
+    # Get unique users
+    users = db.query(func.distinct(CommandLog.user)).order_by(CommandLog.user).all()
+    users_list = [user[0] for user in users if user[0]]
+    
+    # Get unique directories
+    directories = db.query(func.distinct(CommandLog.directory)).order_by(CommandLog.directory).all()
+    directories_list = [dir[0] for dir in directories if dir[0]]
+    
+    return {
+        "users": users_list,
+        "directories": directories_list
     }
 
 

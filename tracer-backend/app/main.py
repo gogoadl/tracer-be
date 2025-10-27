@@ -24,8 +24,8 @@ Base.metadata.create_all(bind=engine)
 
 # FastAPI app
 app = FastAPI(
-    title="AI Log Backend",
-    description="Backend for collecting and serving shell command logs",
+    title="Tracer Backend",
+    description="Backend for tracking and analyzing shell command logs and file changes",
     version="1.0.0"
 )
 
@@ -51,7 +51,7 @@ def get_db():
 @app.on_event("startup")
 async def startup_event():
     """Initialize database and load logs on startup"""
-    print("Starting AI Log Backend...")
+    print("Starting Tracer Backend...")
     
     # Load logs from ~/.command_history
     command_history_path = Path.home() / ".command_history"
@@ -123,7 +123,7 @@ def load_logs_from_file(db, file_path: Path, batch_size: int = 1000):
 
 @app.get("/")
 async def root():
-    return {"message": "AI Log Backend API", "version": "1.0.0"}
+    return {"message": "Tracer Backend API", "version": "1.0.0"}
 
 
 @app.get("/health")

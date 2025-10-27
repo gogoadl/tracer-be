@@ -6,7 +6,9 @@ import ThemeToggle from './components/ThemeToggle';
 import FolderWatcher from './components/FolderWatcher';
 import FileChangeChart from './components/FileChangeChart';
 import FileChangeList from './components/FileChangeList';
-import { fetchDates, fetchLogsByDate, analyzeLogs } from './api';
+import CommandLogChart from './components/CommandLogChart';
+import LogFilters from './components/LogFilters';
+import { fetchDates, fetchLogsByDate, fetchLogsWithFilters, analyzeLogs, fetchLogFilterOptions } from './api';
 
 function App() {
   const [dates, setDates] = useState([]);
@@ -16,7 +18,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const [activeTab, setActiveTab] = useState('logs'); // 'logs' or 'watcher'
+  const [activeMenu, setActiveMenu] = useState('dashboard'); // 'dashboard', 'logs', 'watcher', 'changes'
+  const [filterOptions, setFilterOptions] = useState({ users: [], directories: [] });
+  const [activeFilters, setActiveFilters] = useState({ user: '', search: '', directory: '' });
+  const [searchFilters, setSearchFilters] = useState(null);
+  const [searchResultTotal, setSearchResultTotal] = useState(0);
 
   // Set theme on mount and change
   useEffect(() => {
@@ -30,7 +36,17 @@ function App() {
   // Fetch available dates on mount
   useEffect(() => {
     loadDates();
+    loadFilterOptions();
   }, []);
+
+  const loadFilterOptions = async () => {
+    try {
+      const options = await fetchLogFilterOptions();
+      setFilterOptions(options);
+    } catch (error) {
+      console.error('Error loading filter options:', error);
+    }
+  };
 
   // Fetch logs when date is selected
   useEffect(() => {
@@ -84,115 +100,145 @@ function App() {
     }
   };
 
+  const handleFilterChange = async (filters) => {
+    setActiveFilters(filters);
+    
+    // If a date is selected, re-fetch logs with filters
+    if (selectedDate) {
+      try {
+        setIsLoading(true);
+        const { fetchLogsWithFilters } = await import('./api');
+        const response = await fetchLogsWithFilters({
+          ...filters,
+          start_date: selectedDate,
+          end_date: selectedDate
+        });
+        setLogs(response.logs || []);
+      } catch (error) {
+        console.error('Error loading filtered logs:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleSearch = async (filters) => {
+    setSearchFilters(filters);
+    setIsLoading(true);
+    try {
+      const result = await fetchLogsWithFilters(filters);
+      setLogs(result.logs || []);
+      setSearchResultTotal(result.total || 0);
+    } catch (error) {
+      console.error('Error searching logs:', error);
+      setLogs([]);
+      setSearchResultTotal(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       <div className="flex">
         {/* Sidebar */}
         <Sidebar
-          dates={dates}
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-          isDark={isDark}
+          onMenuSelect={setActiveMenu}
+          activeMenu={activeMenu}
         />
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
           {/* Header */}
           <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-2">
               <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                AI Log Tracker
+                Tracer
               </h1>
               <ThemeToggle onThemeChange={setIsDark} />
-            </div>
-            
-            {/* Tabs */}
-            <div className="flex space-x-1 border-b border-gray-200 dark:border-gray-700">
-              <button
-                onClick={() => setActiveTab('logs')}
-                className={`px-4 py-2 font-medium text-sm transition-colors ${
-                  activeTab === 'logs'
-                    ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-              >
-                📝 Command Logs
-              </button>
-              <button
-                onClick={() => setActiveTab('watcher')}
-                className={`px-4 py-2 font-medium text-sm transition-colors ${
-                  activeTab === 'watcher'
-                    ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-              >
-                📁 File Watcher
-              </button>
-              <button
-                onClick={() => setActiveTab('changes')}
-                className={`px-4 py-2 font-medium text-sm transition-colors ${
-                  activeTab === 'changes'
-                    ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-              >
-                🔄 File Changes
-              </button>
             </div>
           </header>
 
           {/* Content Area */}
           <main className="flex-1 p-6 overflow-y-auto">
-            {activeTab === 'watcher' ? (
-              <>
-                <FolderWatcher />
-                <div className="mt-8">
-                  <FileChangeChart />
-                </div>
-              </>
-            ) : activeTab === 'changes' ? (
-              <FileChangeList />
-            ) : selectedDate ? (
-              <>
-                {/* Summary Card */}
-                <SummaryCard
-                  summary={summary}
-                  onReanalyze={handleReanalyze}
-                  isAnalyzing={isAnalyzing}
-                  date={selectedDate}
-                />
-
-                {/* Log Entries */}
-                <div className="mb-8">
-                  <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                    Command Logs
-                    <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
-                      ({logs.length} {logs.length === 1 ? 'entry' : 'entries'})
-                    </span>
-                  </h2>
-
-                  {isLoading ? (
-                    <div className="flex items-center justify-center py-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                    </div>
-                  ) : logs.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                      No log entries found for this date.
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {logs.map((entry, index) => (
-                        <LogEntry key={index} entry={entry} index={index} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                Select a date from the sidebar to view logs
+            {activeMenu === 'dashboard' ? (
+              <div className="space-y-8">
+                <CommandLogChart />
+                <FileChangeChart />
               </div>
-            )}
+            ) : activeMenu === 'logs' ? (
+              <>
+                {/* Date Selector */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Select Date
+                  </label>
+                  <select
+                    value={selectedDate || ''}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 w-full md:w-64"
+                  >
+                    <option value="">Select a date...</option>
+                    {dates.map(date => (
+                      <option key={date} value={date}>{date}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {selectedDate ? (
+                  <>
+                    {/* Filters */}
+                    <LogFilters
+                      onFilterChange={handleFilterChange}
+                      users={filterOptions.users}
+                      directories={filterOptions.directories}
+                    />
+
+                    {/* Summary Card */}
+                    <SummaryCard
+                      summary={summary}
+                      onReanalyze={handleReanalyze}
+                      isAnalyzing={isAnalyzing}
+                      date={selectedDate}
+                    />
+
+                    {/* Log Entries */}
+                    <div className="mb-8">
+                      <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                        Command Logs
+                        <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
+                          ({logs.length} {logs.length === 1 ? 'entry' : 'entries'})
+                        </span>
+                      </h2>
+
+                      {isLoading ? (
+                        <div className="flex items-center justify-center py-12">
+                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                        </div>
+                      ) : logs.length === 0 ? (
+                        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                          No log entries found for this date.
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {logs.map((entry, index) => (
+                            <LogEntry key={index} entry={entry} index={index} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                    Select a date to view logs
+                  </div>
+                )}
+              </>
+            ) : activeMenu === 'watcher' ? (
+              <FolderWatcher />
+            ) : activeMenu === 'changes' ? (
+              <FileChangeList />
+            ) : null}
           </main>
         </div>
       </div>

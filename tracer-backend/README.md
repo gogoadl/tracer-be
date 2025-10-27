@@ -1,14 +1,15 @@
-# AI Log Backend
+# Tracer Backend
 
-A FastAPI backend service for collecting and analyzing shell command logs from `~/.command_history`.
+A FastAPI backend service for tracking and analyzing shell command logs and file changes.
 
 ## Features
 
-- Collects shell command logs from `~/.command_history`
-- Parses and stores logs in SQLite database
-- Group logs by date
-- Search and filter logs
-- RESTful API endpoints for accessing logs
+- 📝 **Command Logging**: Automatic command logging on Linux systems
+- 📊 **File Watching**: Monitor file changes in specified directories
+- 🔍 **Search & Filter**: Powerful query and filtering capabilities
+- 📈 **Analytics**: Visual analytics with charts and statistics
+- 🌐 **RESTful API**: Comprehensive API endpoints for all features
+- 🎨 **Modern UI**: Beautiful dashboard with dark mode support
 
 ## File Format
 
@@ -57,18 +58,26 @@ uvicorn main:app --reload
 
 ## Quick Start
 
+### 1. Install Command Logger (Linux only)
+
+```bash
+cd tracer-backend
+chmod +x install_logger.sh
+./install_logger.sh
+```
+
+이 명령어는 자동으로 명령어 로깅을 설정합니다. 자세한 내용은 [README_COMMAND_LOGGER.md](./README_COMMAND_LOGGER.md)를 참조하세요.
+
+### 2. Run Backend
+
 **Windows:**
 ```bash
-# Run the batch script
-.\run.bat
+.\start_backend.bat
 ```
 
 **Linux/Mac:**
 ```bash
-# Make script executable
 chmod +x run.sh
-
-# Run the shell script
 ./run.sh
 ```
 
