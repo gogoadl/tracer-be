@@ -22,7 +22,7 @@ if DATABASE_URL.startswith("sqlite"):
     db_path = DATABASE_URL.replace("sqlite:///", "")
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
-print(f"🔗 [FILE_WATCHER] Using database: {db_path}")
+print(f"[FILE_WATCHER] Using database: {db_path}")
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -54,22 +54,22 @@ class FileChangeHandler(FileSystemEventHandler):
             if pattern.startswith("*."):
                 ext = pattern[1:]  # Remove *
                 if file_ext == ext:
-                    print(f"✓ [FILTER] Match: {file_name} matches pattern {pattern}")
+                    print(f"[FILTER] Match: {file_name} matches pattern {pattern}")
                     return True
             elif pattern in src_path:
-                print(f"✓ [FILTER] Match: {file_name} contains {pattern}")
+                print(f"[FILTER] Match: {file_name} contains {pattern}")
                 return True
             elif pattern in file_name:
-                print(f"✓ [FILTER] Match: {file_name} matches {pattern}")
+                print(f"[FILTER] Match: {file_name} matches {pattern}")
                 return True
         
-        print(f"✗ [FILTER] No match: {file_name} does not match any pattern")
+        print(f"[FILTER] No match: {file_name} does not match any pattern")
         return False
     
     def create_log(self, event_type: str, src_path: str, is_directory: bool = False, dest_path: str = None):
         """Create a file change log entry"""
         try:
-            print(f"🔍 [DB_LOG] Creating log for {event_type}: {src_path}")
+            print(f"[DB_LOG] Creating log for {event_type}: {src_path}")
             db = SessionLocal()
             
             timestamp = datetime.now()
@@ -88,31 +88,29 @@ class FileChangeHandler(FileSystemEventHandler):
             if file_path.exists() and file_path.is_file():
                 try:
                     size = file_path.stat().st_size
-                    # Only read content for modified files
-                    if event_type == 'modified' and size < 1024 * 1024:  # Max 1MB
+                    
+                    # Try to get previous version from DB for modified files
+                    if event_type == 'modified':
+                        try:
+                            # Get the last version of this file from DB
+                            last_change = db.query(FileChange).filter_by(
+                                file_path=str(file_path)
+                            ).order_by(FileChange.timestamp.desc()).first()
+                            
+                            if last_change and last_change.raw_data:
+                                try:
+                                    last_data = json.loads(last_change.raw_data)
+                                    content_before = last_data.get("content_after")
+                                except:
+                                    pass
+                        except:
+                            pass
+                    
+                    # Read current content for modified or created files
+                    if event_type in ['modified', 'created'] and size < 1024 * 1024:  # Max 1MB
                         try:
                             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                                 content_after = f.read()
-                        except:
-                            pass
-                except:
-                    pass
-            
-            # Get previous version for modified files
-            if event_type == 'modified':
-                try:
-                    # Get last version of this file from raw_data
-                    last_change = db.query(FileChange).filter_by(
-                        file_path=str(file_path)
-                    ).filter(
-                        FileChange.id < db.query(FileChange).count()
-                    ).order_by(FileChange.timestamp.desc()).first()
-                    
-                    if last_change and last_change.raw_data:
-                        try:
-                            last_data = json.loads(last_change.raw_data)
-                            if last_data.get("content_after"):
-                                content_before = last_data.get("content_after")
                         except:
                             pass
                 except:
@@ -127,7 +125,7 @@ class FileChangeHandler(FileSystemEventHandler):
                         "content_after": content_after
                     })
                 except Exception as e:
-                    print(f"⚠️  [DB_LOG] Failed to JSON encode content: {e}")
+                    print(f"[WARNING] [DB_LOG] Failed to JSON encode content: {e}")
                     content_data = None
             
             file_change = FileChange(
@@ -155,18 +153,18 @@ class FileChangeHandler(FileSystemEventHandler):
             ).order_by(FileChange.id.desc()).first()
             
             if saved_change:
-                print(f"✅ [DB_LOG] Successfully saved file change: {file_name} ({event_type})")
-                print(f"   📝 Change ID: {saved_change.id}")
-                print(f"   📅 Timestamp: {timestamp}")
-                print(f"   📁 File: {file_name}")
-                print(f"   💾 DB Verified: Found record with ID {saved_change.id}")
+                print(f"[OK] [DB_LOG] Successfully saved file change: {file_name} ({event_type})")
+                print(f"   Change ID: {saved_change.id}")
+                print(f"   Timestamp: {timestamp}")
+                print(f"   File: {file_name}")
+                print(f"   DB Verified: Found record with ID {saved_change.id}")
             else:
-                print(f"⚠️  [DB_LOG] Saved but couldn't verify: {file_name} ({event_type})")
+                print(f"[WARNING] [DB_LOG] Saved but couldn't verify: {file_name} ({event_type})")
             
             db.close()
             
         except Exception as e:
-            print(f"❌ [DB_LOG] Error logging file change: {e}")
+            print(f"[ERROR] [DB_LOG] Error logging file change: {e}")
             if 'db' in locals():
                 db.rollback()
                 db.close()
@@ -175,25 +173,25 @@ class FileChangeHandler(FileSystemEventHandler):
     
     def on_created(self, event):
         if not event.is_directory and self.should_process(event.src_path):
-            print(f"📄 [FILE_EVENT] File created: {event.src_path}")
+            print(f"[FILE_EVENT] File created: {event.src_path}")
             self.create_log("created", event.src_path, event.is_directory)
         elif event.is_directory:
-            print(f"📁 [FILE_EVENT] Directory created: {event.src_path} (ignored)")
+            print(f"[FILE_EVENT] Directory created: {event.src_path} (ignored)")
     
     def on_deleted(self, event):
         if not event.is_directory and self.should_process(event.src_path):
-            print(f"🗑️  [FILE_EVENT] File deleted: {event.src_path}")
+            print(f"[FILE_EVENT] File deleted: {event.src_path}")
             self.create_log("deleted", event.src_path, event.is_directory)
         elif event.is_directory:
-            print(f"📁 [FILE_EVENT] Directory deleted: {event.src_path} (ignored)")
+            print(f"[FILE_EVENT] Directory deleted: {event.src_path} (ignored)")
     
     def on_modified(self, event):
         # Skip directory modifications
         if not event.is_directory and self.should_process(event.src_path):
-            print(f"✏️  [FILE_EVENT] File modified: {event.src_path}")
+            print(f"[FILE_EVENT] File modified: {event.src_path}")
             self.create_log("modified", event.src_path, event.is_directory)
         elif event.is_directory:
-            print(f"📁 [FILE_EVENT] Directory modified: {event.src_path} (ignored)")
+            print(f"[FILE_EVENT] Directory modified: {event.src_path} (ignored)")
     
     def on_moved(self, event):
         if not event.is_directory:
@@ -213,12 +211,12 @@ class FileWatcherService:
         """Start watching a folder"""
         # Check if already watching this folder
         if watch_folder.id in self.observers:
-            print(f"⚠️  [WATCHER] Already watching folder {watch_folder.id}, skipping...")
+            print(f"[WARNING] [WATCHER] Already watching folder {watch_folder.id}, skipping...")
             return
         
         folder_path = watch_folder.path
         
-        print(f"🔍 [WATCHER] Starting to watch folder: {folder_path}")
+        print(f"[WATCHER] Starting to watch folder: {folder_path}")
         print(f"   - Recursive: {watch_folder.recursive == 'True'}")
         print(f"   - File patterns: {watch_folder.file_patterns}")
         
@@ -237,7 +235,7 @@ class FileWatcherService:
         observer.start()
         self.observers[watch_folder.id] = observer
         
-        print(f"✅ [WATCHER] Successfully started watching: {folder_path}")
+        print(f"[OK] [WATCHER] Successfully started watching: {folder_path}")
         print(f"   - Observer ID: {watch_folder.id}")
         print(f"   - Active observers: {len(self.observers)}")
     
@@ -251,7 +249,7 @@ class FileWatcherService:
     
     def start_all_active(self):
         """Start watching all active folders"""
-        print(f"\n🔍 [WATCHER] Starting all active folders...")
+        print(f"\n[WATCHER] Starting all active folders...")
         active_folders = self.db_session.query(WatchFolder).filter_by(is_active="True").all()
         print(f"   Found {len(active_folders)} active folder(s)")
         
@@ -259,11 +257,11 @@ class FileWatcherService:
             try:
                 self.start_watching(folder)
             except Exception as e:
-                print(f"❌ [WATCHER] Error starting watcher for {folder.path}: {e}")
+                print(f"[ERROR] [WATCHER] Error starting watcher for {folder.path}: {e}")
                 import traceback
                 traceback.print_exc()
         
-        print(f"✅ [WATCHER] Total active observers: {len(self.observers)}\n")
+        print(f"[OK] [WATCHER] Total active observers: {len(self.observers)}\n")
     
     def stop_all(self):
         """Stop all watchers"""

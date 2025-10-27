@@ -10,8 +10,8 @@ REM Activate virtual environment
 call venv\Scripts\activate.bat
 
 REM Setup sample data if ~/.command_log.jsonl doesn't exist
-if not exist "%HOME%\.command_log.jsonl" (
-    if not exist "%HOME%\.command_history" (
+if not exist "%USERPROFILE%\.command_log.jsonl" (
+    if not exist "%USERPROFILE%\.command_history" (
         echo Setting up sample data...
         python setup_sample_data.py
     ) else (

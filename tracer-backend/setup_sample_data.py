@@ -23,7 +23,7 @@ def setup_sample_data():
     
     # Check if sample file exists
     if not sample_file.exists():
-        print(f"❌ Sample file not found at: {sample_file}")
+        print(f"[X] Sample file not found at: {sample_file}")
         print("Creating JSONL from text file...")
         from create_sample_jsonl import create_sample_jsonl
         create_sample_jsonl()
@@ -32,13 +32,13 @@ def setup_sample_data():
     # Copy the file
     try:
         shutil.copy2(sample_file, dest_file)
-        print(f"✅ Sample data copied to: {dest_file}")
-        print(f"📊 Total lines: {sum(1 for _ in dest_file.open())}")
-        print("\n💡 You can now run the backend and it will load this data:")
+        print(f"[OK] Sample data copied to: {dest_file}")
+        print(f"[INFO] Total lines: {sum(1 for _ in dest_file.open())}")
+        print("\n[TIP] You can now run the backend and it will load this data:")
         print("   cd app")
         print("   uvicorn main:app --reload")
     except Exception as e:
-        print(f"❌ Error copying file: {e}")
+        print(f"[ERROR] Error copying file: {e}")
 
 if __name__ == "__main__":
     setup_sample_data()
