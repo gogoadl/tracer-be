@@ -74,30 +74,35 @@ export const fetchLogsByDate = async (date) => {
 /**
  * Fetch logs with advanced search filters
  * @param {object} filters - Search filters
- * @param {string} filters.startDate - Start date (YYYY-MM-DD)
- * @param {string} filters.endDate - End date (YYYY-MM-DD)
+ * @param {string} filters.start_date - Start date (YYYY-MM-DD)
+ * @param {string} filters.end_date - End date (YYYY-MM-DD)
  * @param {string} filters.user - User filter
  * @param {string} filters.directory - Directory filter
- * @param {string} filters.command - Command search
+ * @param {string} filters.search - Command search
  * @param {number} limit - Limit results
  * @param {number} offset - Offset for pagination
  * @returns {Promise<{logs: Array, total: number, limit: number, offset: number}>} Log entries
  */
-export const fetchLogsWithFilters = async (filters = {}, limit = 100, offset = 0) => {
+export const fetchLogsWithFilters = async (filters = {}) => {
   try {
     const params = new URLSearchParams();
-    if (filters.startDate) params.append('start_date', filters.startDate);
-    if (filters.endDate) params.append('end_date', filters.endDate);
+    
+    // Support both startDate/endDate and start_date/end_date
+    if (filters.start_date) params.append('start_date', filters.start_date);
+    if (filters.end_date) params.append('end_date', filters.end_date);
     if (filters.user) params.append('user', filters.user);
     if (filters.directory) params.append('directory', filters.directory);
-    if (filters.command) params.append('search', filters.command);
-    params.append('limit', limit);
-    params.append('offset', offset);
+    if (filters.search) params.append('search', filters.search);
+    
+    // Use provided limit/offset or defaults
+    params.append('limit', filters.limit || 100);
+    params.append('offset', filters.offset || 0);
     
     const response = await api.get(`/api/logs?${params.toString()}`);
     
+    // Transform to match frontend expectations
     return {
-      logs: response.data.logs.map(log => ({
+      logs: (response.data.logs || []).map(log => ({
         timestamp: log.timestamp,
         time: log.time || new Date(log.timestamp).toLocaleTimeString(),
         user: log.user,
@@ -221,25 +226,6 @@ export const fetchLogFilterOptions = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching filter options:', error);
-    throw error;
-  }
-};
-
-export const fetchLogsWithFilters = async (filters = {}) => {
-  try {
-    const params = new URLSearchParams();
-    if (filters.user) params.append('user', filters.user);
-    if (filters.search) params.append('search', filters.search);
-    if (filters.directory) params.append('directory', filters.directory);
-    if (filters.start_date) params.append('start_date', filters.start_date);
-    if (filters.end_date) params.append('end_date', filters.end_date);
-    if (filters.limit) params.append('limit', filters.limit);
-    if (filters.offset) params.append('offset', filters.offset);
-    
-    const response = await api.get(`/api/logs?${params.toString()}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching logs with filters:', error);
     throw error;
   }
 };

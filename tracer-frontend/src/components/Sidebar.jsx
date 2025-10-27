@@ -1,15 +1,19 @@
+import { useLanguage } from '../contexts/LanguageContext';
+
 const Sidebar = ({ onMenuSelect, activeMenu }) => {
+  const { t } = useLanguage();
+  
   const menuItems = [
-    { id: 'dashboard', icon: '📊', label: '대시보드', name: 'Dashboard' },
-    { id: 'logs', icon: '📝', label: '커맨드 로그', name: 'Command Logs' },
-    { id: 'watcher', icon: '📁', label: '파일 워처', name: 'File Watcher' },
-    { id: 'changes', icon: '🔄', label: '파일 변경사항', name: 'File Changes' },
+    { id: 'dashboard', icon: '📊', labelKey: 'dashboard' },
+    { id: 'logs', icon: '📝', labelKey: 'logs' },
+    { id: 'watcher', icon: '📁', labelKey: 'watcher' },
+    { id: 'changes', icon: '🔄', labelKey: 'changes' },
   ];
 
   return (
     <div className="w-64 min-h-screen bg-gray-100 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">
-        Tracer
+        {t('appTitle')}
       </h1>
       
       <nav className="space-y-2">
@@ -25,8 +29,8 @@ const Sidebar = ({ onMenuSelect, activeMenu }) => {
           >
             <span className="text-2xl">{item.icon}</span>
             <div>
-              <div className="font-medium text-sm">{item.label}</div>
-              <div className="text-xs opacity-75">{item.name}</div>
+              <div className="font-medium text-sm">{t(item.labelKey).label}</div>
+              <div className="text-xs opacity-75">{t(item.labelKey).name}</div>
             </div>
           </button>
         ))}

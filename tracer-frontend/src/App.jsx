@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useLanguage } from './contexts/LanguageContext';
 import Sidebar from './components/Sidebar';
 import SummaryCard from './components/SummaryCard';
 import LogEntry from './components/LogEntry';
 import ThemeToggle from './components/ThemeToggle';
+import LanguageSelector from './components/LanguageSelector';
 import FolderWatcher from './components/FolderWatcher';
 import FileChangeChart from './components/FileChangeChart';
 import FileChangeList from './components/FileChangeList';
@@ -11,6 +13,7 @@ import LogFilters from './components/LogFilters';
 import { fetchDates, fetchLogsByDate, fetchLogsWithFilters, analyzeLogs, fetchLogFilterOptions } from './api';
 
 function App() {
+  const { t, language } = useLanguage();
   const [dates, setDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [logs, setLogs] = useState([]);
@@ -153,9 +156,12 @@ function App() {
           <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
             <div className="flex items-center justify-between mb-2">
               <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                Tracer
+                {t('appTitle')}
               </h1>
-              <ThemeToggle onThemeChange={setIsDark} />
+              <div className="flex items-center gap-3">
+                <LanguageSelector />
+                <ThemeToggle onThemeChange={setIsDark} />
+              </div>
             </div>
           </header>
 
@@ -171,14 +177,14 @@ function App() {
                 {/* Date Selector */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Select Date
+                    {t('selectDate')}
                   </label>
                   <select
                     value={selectedDate || ''}
                     onChange={(e) => setSelectedDate(e.target.value)}
                     className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 w-full md:w-64"
                   >
-                    <option value="">Select a date...</option>
+                    <option value="">{language === 'en' ? 'Select a date...' : '날짜를 선택하세요...'}</option>
                     {dates.map(date => (
                       <option key={date} value={date}>{date}</option>
                     ))}
@@ -205,9 +211,9 @@ function App() {
                     {/* Log Entries */}
                     <div className="mb-8">
                       <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                        Command Logs
+                        {t('commandLogs')}
                         <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
-                          ({logs.length} {logs.length === 1 ? 'entry' : 'entries'})
+                          ({logs.length} {logs.length === 1 ? t('entry') : t('entries')})
                         </span>
                       </h2>
 
@@ -217,7 +223,7 @@ function App() {
                         </div>
                       ) : logs.length === 0 ? (
                         <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                          No log entries found for this date.
+                          {t('noLogsFound')}
                         </div>
                       ) : (
                         <div className="space-y-4">
@@ -230,7 +236,7 @@ function App() {
                   </>
                 ) : (
                   <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                    Select a date to view logs
+                    {t('selectDateToView')}
                   </div>
                 )}
               </>

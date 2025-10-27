@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const SummaryCard = ({ summary, onReanalyze, isAnalyzing, date }) => {
+  const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
@@ -10,7 +12,7 @@ const SummaryCard = ({ summary, onReanalyze, isAnalyzing, date }) => {
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-          AI Summary
+          {t('aiSummary')}
         </h2>
         <div className="flex items-center gap-2">
           <button
@@ -21,7 +23,7 @@ const SummaryCard = ({ summary, onReanalyze, isAnalyzing, date }) => {
             disabled={isAnalyzing}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:bg-blue-400 transition-colors text-sm font-medium"
           >
-            {isAnalyzing ? 'Analyzing...' : 'Reanalyze'}
+            {isAnalyzing ? t('analyzing') : t('reanalyze')}
           </button>
           <svg 
             className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
