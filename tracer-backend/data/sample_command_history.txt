@@ -1,0 +1,139 @@
+2025-10-01 08:30:15 [john] ~/Documents/project: cd /home/john/Documents
+2025-10-01 08:30:45 [john] ~/Documents/project: ls -la
+2025-10-01 08:31:22 [john] ~/Documents/project: git status
+2025-10-01 08:32:10 [john] ~/Documents/project: git add .
+2025-10-01 08:33:05 [john] ~/Documents/project: git commit -m "Initial commit"
+2025-10-01 09:15:30 [john] ~/Documents/project: python -m pip install fastapi
+2025-10-01 09:16:45 [john] ~/Documents/project: python app.py
+2025-10-01 10:20:12 [john] ~/Documents/project: docker build -t myapp .
+2025-10-01 10:25:33 [john] ~/Documents/project: docker run -p 8000:8000 myapp
+2025-10-02 08:45:10 [mary] ~/workspace/backend: cd ~/workspace/backend
+2025-10-02 08:45:30 [mary] ~/workspace/backend: cat requirements.txt
+2025-10-02 08:46:15 [mary] ~/workspace/backend: pip install -r requirements.txt
+2025-10-02 09:00:22 [mary] ~/workspace/backend: git checkout -b feature/auth
+2025-10-02 09:15:45 [mary] ~/workspace/backend: python manage.py migrate
+2025-10-02 09:30:10 [mary] ~/workspace/backend: python manage.py createsuperuser
+2025-10-02 10:00:33 [mary] ~/workspace/backend: pytest tests/
+2025-10-02 14:30:22 [mary] ~/workspace/backend: git push origin feature/auth
+2025-10-03 11:20:15 [john] ~/Documents/project: mkdir src
+2025-10-03 11:20:45 [john] ~/Documents/project: touch src/__init__.py
+2025-10-03 11:22:10 [john] ~/Documents/project: nano src/main.py
+2025-10-03 11:45:30 [john] ~/Documents/project: python src/main.py
+2025-10-03 12:00:15 [john] ~/Documents/project: git add src/
+2025-10-03 12:01:30 [john] ~/Documents/project: git commit -m "Add src directory"
+2025-10-04 09:10:22 [admin] ~/server/logs: tail -f app.log
+2025-10-04 09:15:45 [admin] ~/server/logs: grep ERROR app.log
+2025-10-04 09:30:10 [admin] ~/server/logs: docker ps
+2025-10-04 09:35:22 [admin] ~/server/logs: docker logs -f mycontainer
+2025-10-04 10:00:15 [admin] ~/server/logs: systemctl status nginx
+2025-10-04 10:15:30 [admin] ~/server/logs: journalctl -u app.service
+2025-10-05 08:45:00 [john] ~/Documents/project: curl http://localhost:8000/api/health
+2025-10-05 08:46:22 [john] ~/Documents/project: curl http://localhost:8000/api/logs
+2025-10-05 09:00:15 [john] ~/Documents/project: python -c "import sqlalchemy; print(sqlalchemy.__version__)"
+2025-10-05 09:15:30 [john] ~/Documents/project: export DATABASE_URL=sqlite:///./test.db
+2025-10-05 09:30:45 [john] ~/Documents/project: python test_db.py
+2025-10-06 10:20:15 [mary] ~/workspace/backend: git pull origin main
+2025-10-06 10:25:30 [mary] ~/workspace/backend: npm run build
+2025-10-06 10:40:15 [mary] ~/workspace/backend: npm start
+2025-10-06 11:00:22 [mary] ~/workspace/backend: docker-compose up -d
+2025-10-06 11:15:45 [mary] ~/workspace/backend: kubectl get pods
+2025-10-06 14:30:10 [mary] ~/workspace/backend: kubectl logs deployment/backend
+2025-10-07 09:00:15 [john] ~/Documents/project: python -m pytest tests/test_api.py
+2025-10-07 09:15:30 [john] ~/Documents/project: coverage run -m pytest
+2025-10-07 09:30:45 [john] ~/Documents/project: coverage report
+2025-10-07 10:00:22 [john] ~/Documents/project: black src/
+2025-10-07 10:15:10 [john] ~/Documents/project: flake8 src/
+2025-10-08 08:30:15 [admin] ~/server/logs: df -h
+2025-10-08 08:45:30 [admin] ~/server/logs: free -m
+2025-10-08 09:00:15 [admin] ~/server/logs: top
+2025-10-08 09:30:45 [admin] ~/server/logs: netstat -tulpn | grep 8000
+2025-10-08 10:15:22 [admin] ~/server/logs: iptables -L
+2025-10-09 11:00:15 [john] ~/Documents/project: git log --oneline
+2025-10-09 11:15:30 [john] ~/Documents/project: git diff HEAD~1
+2025-10-09 11:30:45 [john] ~/Documents/project: git stash
+2025-10-09 12:00:15 [john] ~/Documents/project: git checkout -b fix/bug-123
+2025-10-09 14:00:30 [john] ~/Documents/project: git push origin fix/bug-123
+2025-10-10 09:15:22 [mary] ~/workspace/backend: cat .env
+2025-10-10 09:30:45 [mary] ~/workspace/backend: source venv/bin/activate
+2025-10-10 09:45:15 [mary] ~/workspace/backend: alembic upgrade head
+2025-10-10 10:00:30 [mary] ~/workspace/backend: psql -U postgres -d app_db
+2025-10-10 10:30:15 [mary] ~/workspace/backend: redis-cli ping
+2025-10-11 08:45:22 [john] ~/Documents/project: virtualenv venv
+2025-10-11 09:00:15 [john] ~/Documents/project: source venv/bin/activate
+2025-10-11 09:15:30 [john] ~/Documents/project: pip install flask
+2025-10-11 09:30:45 [john] ~/Documents/project: python -m pip install uvicorn
+2025-10-11 10:00:22 [john] ~/Documents/project: uvicorn main:app --reload
+2025-10-12 10:30:15 [admin] ~/server/logs: ls -lh /var/log/
+2025-10-12 10:45:30 [admin] ~/server/logs: journalctl -u docker --since today
+2025-10-12 11:00:15 [admin] ~/server/logs: docker system prune -f
+2025-10-12 11:30:45 [admin] ~/server/logs: certbot renew
+2025-10-13 09:00:22 [john] ~/Documents/project: python -m http.server 8080
+2025-10-13 09:15:45 [john] ~/Documents/project: ngrok http 8080
+2025-10-13 09:30:30 [john] ~/Documents/project: curl https://api.example.com/data
+2025-10-13 10:00:15 [john] ~/Documents/project: jq '.' response.json
+2025-10-14 10:30:22 [mary] ~/workspace/backend: npm run lint
+2025-10-14 10:45:15 [mary] ~/workspace/backend: npm run test
+2025-10-14 11:00:30 [mary] ~/workspace/backend: eslint src/
+2025-10-14 11:30:45 [mary] ~/workspace/backend: prettier --write "**/*.{js,ts}"
+2025-10-15 08:45:15 [admin] ~/server/logs: ssh user@remote-server
+2025-10-15 09:00:30 [admin] ~/server/logs: rsync -avz /backup/ user@remote:/backup/
+2025-10-15 09:30:15 [admin] ~/server/logs: scp file.txt user@remote:/tmp/
+2025-10-15 10:00:45 [admin] ~/server/logs: crontab -l
+2025-10-15 10:30:22 [admin] ~/server/logs: systemctl list-units --type=service
+2025-10-16 09:15:30 [john] ~/Documents/project: git tag v1.0.0
+2025-10-16 09:30:45 [john] ~/Documents/project: git push origin v1.0.0
+2025-10-16 10:00:15 [john] ~/Documents/project: git checkout main
+2025-10-16 10:15:30 [john] ~/Documents/project: git merge develop
+2025-10-16 10:30:45 [john] ~/Documents/project: git push origin main
+2025-10-17 11:00:22 [mary] ~/workspace/backend: docker build --no-cache -t backend:v2 .
+2025-10-17 11:15:45 [mary] ~/workspace/backend: docker run -d -p 8080:8080 backend:v2
+2025-10-17 11:30:30 [mary] ~/workspace/backend: docker exec -it backend_container bash
+2025-10-17 12:00:15 [mary] ~/workspace/backend: kubectl apply -f k8s/deployment.yaml
+2025-10-18 08:30:45 [admin] ~/server/logs: grep -r "error" /var/log/
+2025-10-18 08:45:30 [admin] ~/server/logs: find /var/log -name "*.log" -mtime -1
+2025-10-18 09:15:15 [admin] ~/server/logs: tar -czf logs_backup.tar.gz /var/log/
+2025-10-18 10:00:22 [admin] ~/server/logs: aws s3 cp logs_backup.tar.gz s3://backups/
+2025-10-19 09:00:15 [john] ~/Documents/project: poetry add pytest
+2025-10-19 09:15:30 [john] ~/Documents/project: poetry install
+2025-10-19 09:30:45 [john] ~/Documents/project: poetry run pytest
+2025-10-19 10:00:22 [john] ~/Documents/project: poetry build
+2025-10-20 09:30:15 [mary] ~/workspace/backend: npm outdated
+2025-10-20 09:45:30 [mary] ~/workspace/backend: npm update
+2025-10-20 10:15:45 [mary] ~/workspace/backend: npm audit fix
+2025-10-20 11:00:22 [mary] ~/workspace/backend: yarn upgrade
+2025-10-21 08:00:15 [admin] ~/server/logs: du -sh /var/*
+2025-10-21 08:15:30 [admin] ~/server/logs: lsof -i :8000
+2025-10-21 08:30:45 [admin] ~/server/logs: netstat -ano | grep :3306
+2025-10-21 09:00:22 [admin] ~/server/logs: systemctl restart nginx
+2025-10-22 09:45:15 [john] ~/Documents/project: cp config.example.json config.json
+2025-10-22 10:00:30 [john] ~/Documents/project: sed -i 's/localhost/127.0.0.1/g' config.json
+2025-10-22 10:30:45 [john] ~/Documents/project: cat config.json | jq '.database'
+2025-10-22 11:00:15 [john] ~/Documents/project: rm -rf node_modules/
+2025-10-22 11:15:30 [john] ~/Documents/project: npm install --save-dev jest
+2025-10-23 10:00:22 [mary] ~/workspace/backend: composer install
+2025-10-23 10:15:45 [mary] ~/workspace/backend: php artisan migrate
+2025-10-23 10:30:30 [mary] ~/workspace/backend: php artisan db:seed
+2025-10-23 11:00:15 [mary] ~/workspace/backend: php artisan serve
+2025-10-24 08:30:22 [admin] ~/server/logs: htop
+2025-10-24 08:45:45 [admin] ~/server/logs: iostat -x 1
+2025-10-24 09:15:30 [admin] ~/server/logs: vmstat 1
+2025-10-24 10:00:15 [admin] ~/server/logs: sar -u 1
+2025-10-25 09:45:22 [john] ~/Documents/project: npm run dev
+2025-10-25 10:00:45 [john] ~/Documents/project: webpack --mode production
+2025-10-25 10:30:30 [john] ~/Documents/project: npm run build
+2025-10-25 11:00:15 [john] ~/Documents/project: npx serve build/
+2025-10-26 10:15:30 [mary] ~/workspace/backend: terraform init
+2025-10-26 10:30:45 [mary] ~/workspace/backend: terraform plan
+2025-10-26 11:00:22 [mary] ~/workspace/backend: terraform apply
+2025-10-26 11:30:15 [mary] ~/workspace/backend: aws ec2 describe-instances
+2025-10-27 08:00:30 [admin] ~/server/logs: ufw status
+2025-10-27 08:15:45 [admin] ~/server/logs: fail2ban-client status sshd
+2025-10-27 08:30:22 [admin] ~/server/logs: systemctl status fail2ban
+2025-10-27 09:00:15 [admin] ~/server/logs: ssh-keygen -t rsa
+2025-10-27 09:15:30 [admin] ~/server/logs: ssh-copy-id user@remote-server
+2025-10-27 09:30:45 [john] ~/Documents/project: git fetch origin
+2025-10-27 09:45:15 [john] ~/Documents/project: git merge origin/main
+2025-10-27 10:00:30 [john] ~/Documents/project: git push
+2025-10-27 10:15:22 [john] ~/Documents/project: git log --graph --oneline --all
+2025-10-27 10:30:45 [john] ~/Documents/project: git branch -a
+
