@@ -13,8 +13,8 @@ RUN npm ci
 # Copy frontend source code
 COPY tracer-frontend/ ./
 
-# Build frontend with backend API URL pointing to localhost
-ARG VITE_API_URL=http://localhost:8000
+# Build frontend with API URL pointing to nginx proxy
+ARG VITE_API_URL=""
 ENV VITE_API_URL=$VITE_API_URL
 
 RUN npm run build

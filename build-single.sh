@@ -11,6 +11,7 @@ docker rm tracer-app 2>/dev/null || true
 
 # Build with no cache for clean build
 echo "Building Tracer image..."
+echo "⚠️  This will rebuild the frontend with updated API settings"
 docker build -t tracer:latest . --no-cache
 
 if [ $? -ne 0 ]; then
@@ -85,3 +86,9 @@ echo "  View logs: docker logs tracer-app"
 echo "  Debug: docker exec -it tracer-app bash"
 echo "  Stop: docker stop tracer-app"
 echo "  Remove: docker rm tracer-app"
+
+echo ""
+echo "🔧 If API errors persist:"
+echo "  1. Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)"
+echo "  2. Check browser dev tools Network tab"
+echo "  3. Verify requests go to :8091, not :8000"
