@@ -12,11 +12,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ ./app/
 COPY data/ ./data/
 
+# Ensure data directory exists
+RUN mkdir -p /app/app/data
+
 # Expose port
 EXPOSE 8000
 
 # Run the application from the app directory
 WORKDIR /app/app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 
