@@ -42,18 +42,35 @@ echo "📋 Recent logs:"
 docker logs tracer-app --tail 10
 
 echo ""
-echo "🔍 Testing health check..."
-if curl -s http://localhost:8091/health > /dev/null; then
-    echo "✅ Health check passed!"
+echo "🔍 Testing services..."
+
+# Test backend directly
+echo "Testing backend (port 8000):"
+if docker exec tracer-app curl -s http://127.0.0.1:8000/health > /dev/null; then
+    echo "  ✅ Backend is responding"
 else
-    echo "❌ Health check failed!"
-    echo ""
-    echo "🔧 Debugging info:"
-    echo "Backend logs:"
-    docker exec tracer-app cat /var/log/supervisor/backend.err.log 2>/dev/null || echo "No backend error logs"
-    echo ""
-    echo "Nginx logs:"
-    docker exec tracer-app cat /var/log/supervisor/nginx.err.log 2>/dev/null || echo "No nginx error logs"
+    echo "  ❌ Backend is not responding"
+    echo "  Backend error logs:"
+    docker exec tracer-app cat /var/log/supervisor/backend.err.log 2>/dev/null || echo "  No backend error logs"
+fi
+
+# Test nginx proxy
+echo "Testing nginx proxy (port 8091):"
+if docker exec tracer-app curl -s http://127.0.0.1:8091/health > /dev/null; then
+    echo "  ✅ Nginx proxy is working"
+else
+    echo "  ❌ Nginx proxy is not working"
+    echo "  Nginx error logs:"
+    docker exec tracer-app cat /var/log/supervisor/nginx.err.log 2>/dev/null || echo "  No nginx error logs"
+fi
+
+# Test from host
+echo "Testing from host:"
+if curl -s http://localhost:8091/health > /dev/null; then
+    echo "  ✅ Host can reach the service"
+else
+    echo "  ❌ Host cannot reach the service"
+    echo "  Check if port 8091 is blocked by firewall"
 fi
 
 echo ""
