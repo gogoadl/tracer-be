@@ -99,10 +99,16 @@ const FolderWatcher = () => {
               type="text"
               value={formData.path}
               onChange={(e) => setFormData({ ...formData, path: e.target.value })}
-              placeholder="C:\path\to\folder or /home/user/folder"
+              placeholder="/host/current, /host/home, or /host/root/path"
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               required
             />
+            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 space-y-1">
+              <p><strong>Container paths (use these):</strong></p>
+              <p>• <code>/host/current</code> - Current project directory</p>
+              <p>• <code>/host/home</code> - Your home directory</p>
+              <p>• <code>/host/root/path/to/folder</code> - Any system path</p>
+            </div>
           </div>
           
           <div className="mb-3">

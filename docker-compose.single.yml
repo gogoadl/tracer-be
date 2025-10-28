@@ -15,6 +15,10 @@ services:
       - ./tracer-backend/data:/app/app/data
       # Mount logs directory for Linux command logging (optional)
       - ~/.command_log.jsonl:/app/app/data/.command_log.jsonl:ro
+      # Host filesystem access for file watching
+      - .:/host/current
+      - ${HOME}:/host/home
+      - /:/host/root
     environment:
       - DATABASE_URL=sqlite:///./data/logs.db
       - COMMAND_HISTORY_PATH=/app/app/data/.command_log.jsonl

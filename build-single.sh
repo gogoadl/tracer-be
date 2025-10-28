@@ -21,12 +21,15 @@ fi
 
 echo "✅ Build successful! Starting container..."
 
-# Run container
+# Run container with volume mounts for file watching
 docker run -d \
   --name tracer-app \
   -p 8091:8091 \
   -v $(pwd)/tracer-backend/data:/app/app/data \
   -v ~/.command_log.jsonl:/app/app/data/.command_log.jsonl:ro \
+  -v $(pwd):/host/current \
+  -v $HOME:/host/home \
+  -v /:/host/root \
   -e DATABASE_URL=sqlite:///./data/logs.db \
   -e COMMAND_HISTORY_PATH=/app/app/data/.command_log.jsonl \
   --restart unless-stopped \
@@ -127,4 +130,9 @@ echo "  2. Check browser dev tools Network tab"
 echo "  3. Verify requests go to :8091, not :8000"
 echo "  4. Test specific endpoints:"
 echo "     curl http://localhost:8091/api/folders"
-echo "     curl -X POST http://localhost:8091/api/folders/add?path=/tmp"
+echo "     curl -X POST \"http://localhost:8091/api/folders/add?path=/host/current&recursive=true\""
+echo ""
+echo "📁 Available paths for file watching:"
+echo "  /host/current - Current project directory"
+echo "  /host/home - Your home directory (\$HOME)"
+echo "  /host/root/path/to/folder - Any system path"
