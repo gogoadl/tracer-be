@@ -19,6 +19,9 @@ ENV VITE_API_URL=$VITE_API_URL
 
 RUN npm run build
 
+# Verify frontend build output
+RUN ls -la /frontend/dist/
+
 # Stage 2: Setup Backend with Frontend
 FROM python:3.11-slim
 
@@ -46,15 +49,15 @@ RUN mkdir -p /app/app/data
 # Copy built frontend files to nginx directory
 COPY --from=frontend-build /frontend/dist /usr/share/nginx/html
 
-# Copy nginx configuration
-COPY tracer-frontend/nginx.conf /etc/nginx/conf.d/default.conf
+# Verify frontend files were copied
+RUN ls -la /usr/share/nginx/html/
 
-# Remove default nginx config
-RUN rm /etc/nginx/sites-enabled/default
+# Remove default nginx configs
+RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/conf.d/default.conf
 
 # Create supervisor configuration
 RUN mkdir -p /var/log/supervisor
-COPY <<EOF /etc/supervisor/conf.d/supervisord.conf
+RUN cat > /etc/supervisor/conf.d/supervisord.conf << 'EOF'
 [supervisord]
 nodaemon=true
 user=root
@@ -77,7 +80,7 @@ stderr_logfile=/var/log/supervisor/backend.err.log
 stdout_logfile=/var/log/supervisor/backend.out.log
 EOF
 
-# Update nginx configuration to proxy API requests
+# Create nginx configuration to proxy API requests
 RUN cat > /etc/nginx/conf.d/default.conf << 'EOF'
 server {
     listen 8091;
@@ -137,6 +140,9 @@ server {
     add_header X-XSS-Protection "1; mode=block" always;
 }
 EOF
+
+# Verify nginx configuration
+RUN nginx -t
 
 # Expose port 8091 (nginx will serve both frontend and proxy backend)
 EXPOSE 8091
