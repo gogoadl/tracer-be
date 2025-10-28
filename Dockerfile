@@ -64,13 +64,6 @@ user=root
 logfile=/var/log/supervisor/supervisord.log
 pidfile=/var/run/supervisord.pid
 
-[program:nginx]
-command=nginx -g "daemon off;"
-autostart=true
-autorestart=true
-stderr_logfile=/var/log/supervisor/nginx.err.log
-stdout_logfile=/var/log/supervisor/nginx.out.log
-
 [program:backend]
 command=python -m uvicorn main:app --host 0.0.0.0 --port 8000
 directory=/app/app
@@ -78,6 +71,15 @@ autostart=true
 autorestart=true
 stderr_logfile=/var/log/supervisor/backend.err.log
 stdout_logfile=/var/log/supervisor/backend.out.log
+priority=100
+
+[program:nginx]
+command=nginx -g "daemon off;"
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/supervisor/nginx.err.log
+stdout_logfile=/var/log/supervisor/nginx.out.log
+priority=200
 EOF
 
 # Create nginx configuration to proxy API requests
@@ -96,29 +98,35 @@ server {
 
     # API proxy to backend
     location /api/ {
-        proxy_pass http://localhost:8000/api/;
+        proxy_pass http://127.0.0.1:8000/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 30s;
+        proxy_send_timeout 30s;
+        proxy_read_timeout 30s;
     }
 
     # Health check proxy
     location /health {
-        proxy_pass http://localhost:8000/health;
+        proxy_pass http://127.0.0.1:8000/health;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        proxy_connect_timeout 10s;
+        proxy_send_timeout 10s;
+        proxy_read_timeout 10s;
     }
 
     # Docs proxy
     location /docs {
-        proxy_pass http://localhost:8000/docs;
+        proxy_pass http://127.0.0.1:8000/docs;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
 
     location /openapi.json {
-        proxy_pass http://localhost:8000/openapi.json;
+        proxy_pass http://127.0.0.1:8000/openapi.json;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
