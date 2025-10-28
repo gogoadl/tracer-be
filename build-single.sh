@@ -49,6 +49,24 @@ echo "🔍 Testing services..."
 echo "Testing backend (port 8000):"
 if docker exec tracer-app curl -s http://127.0.0.1:8000/health > /dev/null; then
     echo "  ✅ Backend is responding"
+    
+    # Test specific API endpoints
+    echo "  Testing API endpoints:"
+    
+    # Test folders endpoint
+    if docker exec tracer-app curl -s http://127.0.0.1:8000/api/folders > /dev/null; then
+        echo "    ✅ /api/folders endpoint working"
+    else
+        echo "    ❌ /api/folders endpoint failed"
+    fi
+    
+    # Test docs endpoint
+    if docker exec tracer-app curl -s http://127.0.0.1:8000/docs > /dev/null; then
+        echo "    ✅ /docs endpoint working"
+    else
+        echo "    ❌ /docs endpoint failed"
+    fi
+    
 else
     echo "  ❌ Backend is not responding"
     echo "  Backend error logs:"
@@ -59,6 +77,21 @@ fi
 echo "Testing nginx proxy (port 8091):"
 if docker exec tracer-app curl -s http://127.0.0.1:8091/health > /dev/null; then
     echo "  ✅ Nginx proxy is working"
+    
+    # Test API proxy
+    echo "  Testing API proxy:"
+    
+    # Test folders endpoint through proxy
+    if docker exec tracer-app curl -s http://127.0.0.1:8091/api/folders > /dev/null; then
+        echo "    ✅ /api/folders proxy working"
+    else
+        echo "    ❌ /api/folders proxy failed"
+        echo "    Nginx access log:"
+        docker exec tracer-app tail -5 /var/log/nginx/access.log 2>/dev/null || echo "    No access log"
+        echo "    Nginx error log:"
+        docker exec tracer-app tail -5 /var/log/nginx/error.log 2>/dev/null || echo "    No error log"
+    fi
+    
 else
     echo "  ❌ Nginx proxy is not working"
     echo "  Nginx error logs:"
