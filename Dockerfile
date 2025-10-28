@@ -46,6 +46,9 @@ COPY tracer-backend/data/ ./data/
 # Ensure data directory exists
 RUN mkdir -p /app/app/data
 
+# Add Python path for imports
+ENV PYTHONPATH="/app:/app/app"
+
 # Copy built frontend files to nginx directory
 COPY --from=frontend-build /frontend/dist /usr/share/nginx/html
 
@@ -65,13 +68,14 @@ logfile=/var/log/supervisor/supervisord.log
 pidfile=/var/run/supervisord.pid
 
 [program:backend]
-command=python -m uvicorn main:app --host 0.0.0.0 --port 8000
+command=python -m uvicorn main:app --host 0.0.0.0 --port 8000 --log-level info
 directory=/app/app
 autostart=true
 autorestart=true
 stderr_logfile=/var/log/supervisor/backend.err.log
 stdout_logfile=/var/log/supervisor/backend.out.log
 priority=100
+environment=PYTHONPATH="/app"
 
 [program:nginx]
 command=nginx -g "daemon off;"
@@ -151,6 +155,9 @@ EOF
 
 # Verify nginx configuration
 RUN nginx -t
+
+# Test backend imports before starting
+RUN cd /app/app && python -c "import main; print('Backend imports OK')"
 
 # Expose port 8091 (nginx will serve both frontend and proxy backend)
 EXPOSE 8091
