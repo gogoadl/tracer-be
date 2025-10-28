@@ -204,6 +204,7 @@ async def health():
 
 
 @app.get("/config")
+@app.get("/api/config")
 async def get_config():
     """Get current configuration"""
     config = load_config()
@@ -216,6 +217,7 @@ async def get_config():
 
 
 @app.post("/config")
+@app.post("/api/config")
 async def update_config(config_data: dict):
     """Update configuration"""
     current_config = load_config()
@@ -237,6 +239,7 @@ async def update_config(config_data: dict):
 
 
 @app.post("/reload-logs")
+@app.post("/api/reload-logs")
 async def reload_logs():
     """Reload logs from the configured path"""
     db = SessionLocal()

@@ -17,7 +17,7 @@ const ConfigSettings = () => {
 
   const loadConfig = async () => {
     try {
-      const response = await fetch('http://localhost:8000/config');
+      const response = await fetch('/api/config');
       const data = await response.json();
       setConfig(data);
       setNewPath(data.command_history_path || '');
@@ -38,7 +38,7 @@ const ConfigSettings = () => {
     setMessage('');
     
     try {
-      const response = await fetch('http://localhost:8000/config', {
+      const response = await fetch('/api/config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const ConfigSettings = () => {
       await loadConfig();
       
       // Then reload logs
-      const response = await fetch('http://localhost:8000/reload-logs', {
+      const response = await fetch('/api/reload-logs', {
         method: 'POST',
       });
 
@@ -106,11 +106,11 @@ const ConfigSettings = () => {
 
     try {
       // Test if path exists
-      const response = await fetch('http://localhost:8000/config');
+      const response = await fetch('/api/config');
       const data = await response.json();
       
       // Update config temporarily to test
-      await fetch('http://localhost:8000/config', {
+      await fetch('/api/config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
