@@ -30,10 +30,44 @@ RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
     curl \
+    bash \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
 WORKDIR /app
+
+# Setup command logging functionality
+RUN mkdir -p /usr/local/bin && \
+    echo '#!/bin/bash' > /usr/local/bin/install-command-logger.sh && \
+    echo 'echo "Installing command logger for Tracer..."' >> /usr/local/bin/install-command-logger.sh && \
+    echo 'LOG_FILE="$HOME/.command_log.jsonl"' >> /usr/local/bin/install-command-logger.sh && \
+    echo 'SHELL_RC=""' >> /usr/local/bin/install-command-logger.sh && \
+    echo 'if [ -n "$BASH_VERSION" ]; then' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    SHELL_RC="$HOME/.bashrc"' >> /usr/local/bin/install-command-logger.sh && \
+    echo 'elif [ -n "$ZSH_VERSION" ]; then' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    SHELL_RC="$HOME/.zshrc"' >> /usr/local/bin/install-command-logger.sh && \
+    echo 'else' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    SHELL_RC="$HOME/.profile"' >> /usr/local/bin/install-command-logger.sh && \
+    echo 'fi' >> /usr/local/bin/install-command-logger.sh && \
+    echo 'touch "$LOG_FILE"' >> /usr/local/bin/install-command-logger.sh && \
+    echo 'if ! grep -q "command_log_function" "$SHELL_RC" 2>/dev/null; then' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "# Tracer Command Logging" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "command_log_function() {" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "    local cmd=\"\$1\"" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "    if [ -n \"\$cmd\" ] && [ \"\$cmd\" != \"command_log_function\" ]; then" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "        local timestamp=\$(date -u +\"%Y-%m-%dT%H:%M:%S\")" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "        local user=\$(whoami)" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "        local directory=\$(pwd)" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "        echo \"{\\\"timestamp\\\":\\\"\$timestamp\\\",\\\"user\\\":\\\"\$user\\\",\\\"directory\\\":\\\"\$directory\\\",\\\"command\\\":\\\"\$cmd\\\"}\" >> \"'$LOG_FILE'\"" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "    fi" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "}" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "export PROMPT_COMMAND=\"command_log_function \\\"\\\$(history 1 | sed \\\"s/^[ ]*[0-9]*[ ]*//\\\")\\\"\"" >> "$SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "✅ Command logger installed. Run: source $SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo 'else' >> /usr/local/bin/install-command-logger.sh && \
+    echo '    echo "ℹ️  Command logger already installed in $SHELL_RC"' >> /usr/local/bin/install-command-logger.sh && \
+    echo 'fi' >> /usr/local/bin/install-command-logger.sh && \
+    chmod +x /usr/local/bin/install-command-logger.sh
 
 # Copy backend requirements and install Python dependencies
 COPY tracer-backend/requirements.txt ./

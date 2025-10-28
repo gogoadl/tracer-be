@@ -12,27 +12,34 @@
 
 ## 빌드 및 실행
 
-### 방법 1: Docker Compose 사용 (권장)
+### 1단계: 이미지 빌드
 
 ```bash
-# 단일 서비스로 실행
-docker-compose -f docker-compose.single.yml up --build
-
-# 백그라운드 실행
-docker-compose -f docker-compose.single.yml up --build -d
-```
-
-### 방법 2: 빌드 스크립트 사용
-
-**Linux/Mac:**
-```bash
-chmod +x build-single.sh
+# Docker 이미지 빌드
 ./build-single.sh
 ```
 
-**Windows:**
-```cmd
-build-single.bat
+### 2단계: 애플리케이션 실행
+
+**방법 A: 실행 스크립트 사용 (권장)**
+```bash
+# Linux/WSL
+./run-single.sh
+
+# Windows
+run-single.bat
+```
+
+**방법 B: Docker Compose 직접 사용**
+```bash
+# 애플리케이션 시작
+docker-compose -f docker-compose.single.yml up -d
+
+# 로그 확인
+docker-compose -f docker-compose.single.yml logs -f
+
+# 애플리케이션 중지
+docker-compose -f docker-compose.single.yml down
 ```
 
 ### 방법 3: 수동 Docker 명령어
