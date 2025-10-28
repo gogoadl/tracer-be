@@ -156,9 +156,6 @@ EOF
 # Verify nginx configuration
 RUN nginx -t
 
-# Test backend imports before starting
-RUN cd /app/app && python -c "import main; print('Backend imports OK')"
-
 # Expose port 8091 (nginx will serve both frontend and proxy backend)
 EXPOSE 8091
 

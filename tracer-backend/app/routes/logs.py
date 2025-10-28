@@ -198,13 +198,13 @@ async def refresh_logs(
     
     try:
         command_history_path = get_command_history_path()
-    
-    if not command_history_path.exists():
+        
+        if not command_history_path.exists():
             raise HTTPException(
                 status_code=404, 
                 detail=f"Command history file not found at {command_history_path}. Please check the file path in Configuration settings."
             )
-    
+        
         # Load logs from file
         from main import load_logs_from_file
         load_logs_from_file(db, command_history_path)
