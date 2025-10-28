@@ -6,6 +6,7 @@
 # Documentation
 *.md
 !README.md
+!SINGLE_DOCKER_DEPLOYMENT.md
 
 # Python
 __pycache__
@@ -13,13 +14,13 @@ __pycache__
 *$py.class
 *.so
 .Python
-venv/
-env/
-ENV/
-.venv
+tracer-backend/venv/
+tracer-backend/env/
+tracer-backend/ENV/
+tracer-backend/.venv
 
 # Node
-node_modules/
+tracer-frontend/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -37,8 +38,8 @@ yarn-error.log*
 Thumbs.db
 
 # Build
-dist/
-build/
+tracer-frontend/dist/
+tracer-frontend/build/
 *.egg-info/
 
 # Tests
@@ -63,4 +64,10 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+
+# Docker
+docker-compose.yml
+tracer-backend/Dockerfile
+tracer-frontend/Dockerfile
+tracer-backend/docker-compose.yml
 
