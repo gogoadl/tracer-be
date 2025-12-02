@@ -152,16 +152,7 @@ server {
         proxy_buffering off;
         proxy_http_version 1.1;
         proxy_set_header Connection "";
-        
-        # Error handling - return 502 if backend is down
-        proxy_intercept_errors on;
-        error_page 502 503 504 = @backend_error;
-    }
-    
-    # Backend error handler
-    location @backend_error {
-        default_type application/json;
-        return 502 '{"error": "Backend service unavailable", "message": "The backend service is not responding. Please check the container logs."}';
+
     }
 
     # Health check proxy
