@@ -4,22 +4,30 @@
 
 echo "=== Starting Tracer Application ==="
 
-# Stop and remove existing container
-echo "Stopping existing containers..."
-docker-compose -f docker-compose.single.yml down
+# Check if container is running and stop/remove if needed
+echo "Checking for existing containers..."
+if docker ps --filter name=tracer-app --format "{{.Names}}" | grep -q "tracer-app"; then
+    echo "Container is running. Stopping and removing..."
+    docker compose -f docker-compose.single.yml down
+elif docker ps -a --filter name=tracer-app --format "{{.Names}}" | grep -q "tracer-app"; then
+    echo "Container exists but not running. Removing..."
+    docker compose -f docker-compose.single.yml down
+else
+    echo "No existing container found."
+fi
 
 echo "Starting Tracer with Docker Compose..."
-docker-compose -f docker-compose.single.yml up -d
+docker compose -f docker-compose.single.yml up -d
 
 echo "⏳ Waiting for services to start..."
 sleep 15
 
 echo "📊 Checking container status..."
-docker-compose -f docker-compose.single.yml ps
+docker compose -f docker-compose.single.yml ps
 
 echo ""
 echo "📋 Recent logs:"
-docker-compose -f docker-compose.single.yml logs --tail 10
+docker compose -f docker-compose.single.yml logs --tail 10
 
 echo ""
 echo "🔍 Testing services..."
@@ -94,10 +102,10 @@ echo "  Health check: http://localhost:8091/health"
 
 echo ""
 echo "📝 Management commands:"
-echo "  View logs: docker-compose -f docker-compose.single.yml logs -f"
+echo "  View logs: docker compose -f docker-compose.single.yml logs -f"
 echo "  Debug: docker exec -it tracer-app bash"
-echo "  Stop: docker-compose -f docker-compose.single.yml down"
-echo "  Restart: docker-compose -f docker-compose.single.yml restart"
+echo "  Stop: docker compose -f docker-compose.single.yml down"
+echo "  Restart: docker compose -f docker-compose.single.yml restart"
 
 echo ""
 echo "🔧 If API errors persist:"

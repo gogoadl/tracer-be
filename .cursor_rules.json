@@ -1,0 +1,63 @@
+{
+    "name": "Python/React Development Focus Rules",
+    "version": 1,
+    "rules": [
+      {
+        "description": "Focus on Python source files (Backend/Service Logic).",
+        "type": "file_generation",
+        "action": "include",
+        "pattern": "**/*.py",
+        "scope": "project"
+      },
+      {
+        "description": "Focus on React/TypeScript/JavaScript files (Frontend/UI).",
+        "type": "file_generation",
+        "action": "include",
+        "pattern": "**/*.{js,jsx,ts,tsx}",
+        "scope": "project"
+      },
+      {
+        "description": "Focus on configuration and environment files (Service/Logging/Detection Settings).",
+        "type": "file_generation",
+        "action": "include",
+        "pattern": "**/*.{json,yaml,yml,ini,env,cfg}",
+        "scope": "project"
+      },
+      {
+        "description": "Focus on documentation.",
+        "type": "file_generation",
+        "action": "include",
+        "pattern": "**/README.md",
+        "scope": "project"
+      },
+      
+      {
+        "description": "Prevent creation/modification of shell and batch script files.",
+        "type": "file_generation",
+        "action": "ignore",
+        "pattern": "**/*.{sh,bat,cmd}",
+        "scope": "project"
+      },
+      {
+        "description": "Ignore build and distribution directories (e.g., Python venvs, npm/yarn dependencies).",
+        "type": "file_generation",
+        "action": "ignore",
+        "pattern": "{**/node_modules,**/venv,**/.venv,**/dist,**/build,**/.git}",
+        "scope": "global"
+      },
+      {
+        "description": "Ignore compiled/minified files and map files.",
+        "type": "file_generation",
+        "action": "ignore",
+        "pattern": "**/*.{min.js,d.ts,map,log}",
+        "scope": "project"
+      },
+      {
+        "description": "Ignore static asset files unless explicitly needed.",
+        "type": "file_generation",
+        "action": "ignore",
+        "pattern": "**/*.{png,jpg,jpeg,gif,svg,ico,woff,ttf,eot}",
+        "scope": "project"
+      }
+    ]
+  }
