@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAlert } from './components/AlertContext';
 import Sidebar from './components/Sidebar';
@@ -18,6 +19,8 @@ import { fetchDates, fetchLogsByDate, fetchLogsWithFilters, analyzeLogs, fetchLo
 function App() {
   const { t, language } = useLanguage();
   const { success: showSuccess, error: showError } = useAlert();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [dates, setDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [logs, setLogs] = useState([]);
@@ -25,11 +28,30 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const [activeMenu, setActiveMenu] = useState('dashboard'); // 'dashboard', 'logs', 'watcher', 'changes'
+  
+  // Get active menu from URL path
+  const getActiveMenuFromPath = () => {
+    const path = location.pathname;
+    if (path === '/' || path === '/dashboard') return 'dashboard';
+    if (path === '/logs') return 'logs';
+    if (path === '/watcher') return 'watcher';
+    if (path === '/changes') return 'changes';
+    if (path === '/config') return 'config';
+    return 'dashboard'; // default
+  };
+  
+  const [activeMenu, setActiveMenu] = useState(getActiveMenuFromPath());
   const [filterOptions, setFilterOptions] = useState({ users: [], directories: [] });
   const [activeFilters, setActiveFilters] = useState({ user: '', search: '', directory: '' });
   const [searchFilters, setSearchFilters] = useState(null);
   const [searchResultTotal, setSearchResultTotal] = useState(0);
+  
+  // Update active menu when URL changes
+  useEffect(() => {
+    const menu = getActiveMenuFromPath();
+    setActiveMenu(menu);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   // Set theme on mount and change
   useEffect(() => {
@@ -190,7 +212,18 @@ function App() {
       <div className="flex">
         {/* Sidebar */}
         <Sidebar
-          onMenuSelect={setActiveMenu}
+          onMenuSelect={(menuId) => {
+            setActiveMenu(menuId);
+            // Navigate to the corresponding route
+            const routes = {
+              'dashboard': '/dashboard',
+              'logs': '/logs',
+              'watcher': '/watcher',
+              'changes': '/changes',
+              'config': '/config'
+            };
+            navigate(routes[menuId] || '/dashboard');
+          }}
           activeMenu={activeMenu}
         />
 
