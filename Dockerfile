@@ -8,7 +8,8 @@ WORKDIR /frontend
 COPY tracer-frontend/package*.json ./
 
 # Install frontend dependencies
-RUN npm ci
+# Use npm install instead of npm ci to handle package-lock.json sync issues
+RUN npm install
 
 # Copy frontend source code
 COPY tracer-frontend/ ./
@@ -22,8 +23,20 @@ RUN npm run build
 # Verify frontend build output
 RUN ls -la /frontend/dist/
 
-# Stage 2: Setup Backend with Frontend
-FROM python:3.11-slim
+# Stage 2: Build Spring Boot Backend
+FROM maven:3.9-eclipse-temurin-17 AS backend-build
+
+WORKDIR /build
+
+# Copy Maven files
+COPY tracer-backend/pom.xml ./
+COPY tracer-backend/src ./src
+
+# Build Spring Boot application
+RUN mvn clean package -DskipTests
+
+# Stage 3: Setup Backend with Frontend
+FROM eclipse-temurin:17-jre-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -69,20 +82,14 @@ RUN mkdir -p /usr/local/bin && \
     echo 'fi' >> /usr/local/bin/install-command-logger.sh && \
     chmod +x /usr/local/bin/install-command-logger.sh
 
-# Copy backend requirements and install Python dependencies
-COPY tracer-backend/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy built Spring Boot JAR from build stage
+COPY --from=backend-build /build/target/tracer-backend-1.0.0.jar /app/tracer-backend.jar
 
-# Copy backend application files
-COPY tracer-backend/app/ ./app/
 # Copy data directory (will be mounted at runtime, but needed for initial setup)
 COPY tracer-backend/data/ ./data/
 
 # Ensure data directory exists
-RUN mkdir -p /app/app/data
-
-# Add Python path for imports
-ENV PYTHONPATH="/app:/app/app"
+RUN mkdir -p /app/data
 
 # Copy built frontend files to nginx directory
 COPY --from=frontend-build /frontend/dist /usr/share/nginx/html
@@ -103,14 +110,13 @@ logfile=/var/log/supervisor/supervisord.log
 pidfile=/var/run/supervisord.pid
 
 [program:backend]
-command=python -m uvicorn main:app --host 0.0.0.0 --port 8000 --log-level info
-directory=/app/app
+command=java -Xmx512m -Xms256m -Dspring.datasource.url=jdbc:sqlite:./data/logs.db -DCOMMAND_HISTORY_PATH=/app/data/.command_log.jsonl -jar /app/tracer-backend.jar
+directory=/app
 autostart=true
 autorestart=true
 stderr_logfile=/var/log/supervisor/backend.err.log
 stdout_logfile=/var/log/supervisor/backend.out.log
 priority=100
-environment=PYTHONPATH="/app:/app/app"
 
 [program:nginx]
 command=nginx -g "daemon off;"

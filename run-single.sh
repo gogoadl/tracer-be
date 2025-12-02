@@ -48,8 +48,8 @@ fi
 
 # Check if backend process is running
 echo "Checking backend process..."
-if docker exec tracer-app ps aux | grep -q "[u]vicorn.*8000"; then
-    echo "  ✅ Backend process (uvicorn) is running"
+if docker exec tracer-app ps aux | grep -q "[j]ava.*tracer-backend.jar"; then
+    echo "  ✅ Backend process (Spring Boot) is running"
 else
     echo "  ❌ Backend process is not running"
     echo "  Backend error log:"
@@ -117,11 +117,11 @@ if docker exec tracer-app curl -s http://127.0.0.1:8000/health > /dev/null; then
         echo "    ❌ /api/folders endpoint failed"
     fi
     
-    # Test docs endpoint
-    if docker exec tracer-app curl -s http://127.0.0.1:8000/docs > /dev/null; then
-        echo "    ✅ /docs endpoint working"
+    # Test root endpoint
+    if docker exec tracer-app curl -s http://127.0.0.1:8000/ > /dev/null; then
+        echo "    ✅ / endpoint working"
     else
-        echo "    ❌ /docs endpoint failed"
+        echo "    ❌ / endpoint failed"
     fi
     
 else

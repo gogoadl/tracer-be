@@ -11,17 +11,18 @@ services:
     ports:
       - "8091:8091"
     volumes:
-      # Mount data directory for persistence
-      - ./tracer-backend/data:/app/app/data
+      # Mount data directory for persistence (Spring Boot uses /app/data)
+      - ./tracer-backend/data:/app/data
       # Mount logs directory for Linux command logging (optional)
-      - ~/.command_log.jsonl:/app/app/data/.command_log.jsonl:ro
+      - ~/.command_log.jsonl:/app/data/.command_log.jsonl:ro
       # Host filesystem access for file watching
       - .:/host/current
       - ${HOME}:/host/home
       - /:/host/root
     environment:
-      - DATABASE_URL=sqlite:///./data/logs.db
-      - COMMAND_HISTORY_PATH=/app/app/data/.command_log.jsonl
+      - DATABASE_URL=jdbc:sqlite:./data/logs.db
+      - COMMAND_HISTORY_PATH=/app/data/.command_log.jsonl
+      - SPRING_DATASOURCE_URL=jdbc:sqlite:./data/logs.db
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8091/health"]
