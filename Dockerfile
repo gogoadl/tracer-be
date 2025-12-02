@@ -128,6 +128,10 @@ server {
     server_name localhost;
     root /usr/share/nginx/html;
     index index.html;
+    
+    # Error logging
+    error_log /var/log/nginx/error.log warn;
+    access_log /var/log/nginx/access.log;
 
     # Enable gzip compression
     gzip on;
@@ -142,9 +146,22 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_connect_timeout 30s;
+        proxy_connect_timeout 10s;
         proxy_send_timeout 30s;
         proxy_read_timeout 30s;
+        proxy_buffering off;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        
+        # Error handling - return 502 if backend is down
+        proxy_intercept_errors on;
+        error_page 502 503 504 = @backend_error;
+    }
+    
+    # Backend error handler
+    location @backend_error {
+        default_type application/json;
+        return 502 '{"error": "Backend service unavailable", "message": "The backend service is not responding. Please check the container logs."}';
     }
 
     # Health check proxy
