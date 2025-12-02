@@ -110,13 +110,14 @@ logfile=/var/log/supervisor/supervisord.log
 pidfile=/var/run/supervisord.pid
 
 [program:backend]
-command=java -Xmx512m -Xms256m -Dspring.datasource.url=jdbc:sqlite:./data/logs.db -DCOMMAND_HISTORY_PATH=/app/data/.command_log.jsonl -jar /app/tracer-backend.jar
+command=java -Xmx512m -Xms256m -jar /app/tracer-backend.jar
 directory=/app
 autostart=true
 autorestart=true
 stderr_logfile=/var/log/supervisor/backend.err.log
 stdout_logfile=/var/log/supervisor/backend.out.log
 priority=100
+environment=SPRING_DATASOURCE_URL="jdbc:sqlite:./data/logs.db",COMMAND_HISTORY_PATH="/app/data/.command_log.jsonl",DATABASE_URL="jdbc:sqlite:./data/logs.db"
 
 [program:nginx]
 command=nginx -g "daemon off;"
@@ -171,15 +172,9 @@ server {
         proxy_read_timeout 10s;
     }
 
-    # Docs proxy
-    location /docs {
-        proxy_pass http://127.0.0.1:8000/docs;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    location /openapi.json {
-        proxy_pass http://127.0.0.1:8000/openapi.json;
+    # Spring Boot Actuator endpoints (if enabled)
+    location /actuator {
+        proxy_pass http://127.0.0.1:8000/actuator;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
