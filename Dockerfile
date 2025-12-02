@@ -75,6 +75,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend application files
 COPY tracer-backend/app/ ./app/
+# Copy data directory (will be mounted at runtime, but needed for initial setup)
 COPY tracer-backend/data/ ./data/
 
 # Ensure data directory exists
@@ -89,8 +90,8 @@ COPY --from=frontend-build /frontend/dist /usr/share/nginx/html
 # Verify frontend files were copied
 RUN ls -la /usr/share/nginx/html/
 
-# Remove default nginx configs
-RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/conf.d/default.conf
+# Remove default nginx configs (if they exist)
+RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/conf.d/default.conf || true
 
 # Create supervisor configuration
 RUN mkdir -p /var/log/supervisor
@@ -109,7 +110,7 @@ autorestart=true
 stderr_logfile=/var/log/supervisor/backend.err.log
 stdout_logfile=/var/log/supervisor/backend.out.log
 priority=100
-environment=PYTHONPATH="/app"
+environment=PYTHONPATH="/app:/app/app"
 
 [program:nginx]
 command=nginx -g "daemon off;"
