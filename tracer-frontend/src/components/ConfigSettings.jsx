@@ -18,7 +18,9 @@ const ConfigSettings = () => {
   const loadConfig = async () => {
     try {
       const response = await fetch('/api/config');
-      const data = await response.json();
+      const result = await response.json();
+      // Handle ApiResponse format
+      const data = result.data || result;
       setConfig(data);
       setNewPath(data.command_history_path || '');
     } catch (error) {
@@ -48,14 +50,17 @@ const ConfigSettings = () => {
         }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
       
       if (response.ok) {
-        setMessage(data.message);
+        // Handle ApiResponse format
+        const message = result.message || 'Configuration updated successfully';
+        setMessage(message);
         setMessageType('success');
         await loadConfig();
       } else {
-        setMessage(data.detail || 'Failed to update configuration');
+        const errorMessage = result.message || result.detail || 'Failed to update configuration';
+        setMessage(errorMessage);
         setMessageType('error');
       }
     } catch (error) {
@@ -80,10 +85,12 @@ const ConfigSettings = () => {
         method: 'POST',
       });
 
-      const data = await response.json();
+      const result = await response.json();
       
       if (response.ok) {
-        showSuccess('Logs reloaded successfully');
+        // Handle ApiResponse format
+        const message = result.message || 'Logs reloaded successfully';
+        showSuccess(message);
         
         // Reload config again to get updated status
         await loadConfig();
@@ -91,7 +98,8 @@ const ConfigSettings = () => {
         // Notify parent to reload logs
         window.dispatchEvent(new CustomEvent('logsReloaded'));
       } else {
-        showError(data.detail || 'Failed to reload logs');
+        const errorMessage = result.message || result.detail || 'Failed to reload logs';
+        showError(errorMessage);
       }
     } catch (error) {
       showError('Failed to reload logs: ' + error.message);
@@ -105,24 +113,27 @@ const ConfigSettings = () => {
     if (!newPath.trim()) return;
 
     try {
-      // Test if path exists
-      const response = await fetch('/api/config');
-      const data = await response.json();
-      
       // Update config temporarily to test
-      await fetch('/api/config', {
+      const response = await fetch('/api/config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          command_history_path: newPath
+          config: {
+            command_history_path: newPath
+          }
         }),
       });
 
       await loadConfig();
       
-      if (config?.command_history_exists) {
+      // Reload config to check if file exists
+      const checkResponse = await fetch('/api/config');
+      const checkResult = await checkResponse.json();
+      const checkData = checkResult.data || checkResult;
+      
+      if (checkData?.command_history_exists) {
         setMessage('Path is valid and file exists');
         setMessageType('success');
       } else {

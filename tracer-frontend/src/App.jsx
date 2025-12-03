@@ -148,7 +148,7 @@ function App() {
       }
     } catch (error) {
       console.error('Error reloading logs:', error);
-      showError(error.response?.data?.detail || 'Failed to reload logs from file');
+      showError(error.message || 'Failed to reload logs from file');
     } finally {
       setIsLoading(false);
     }

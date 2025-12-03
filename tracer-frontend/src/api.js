@@ -7,17 +7,47 @@ const api = axios.create({
 });
 
 /**
+ * Extract data from ApiResponse format
+ * @param {object} response - Axios response object
+ * @returns {any} The data from response.data.data
+ */
+const extractData = (response) => {
+  // Check if response follows ApiResponse format
+  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+    return response.data.data;
+  }
+  // Fallback for non-standard responses
+  return response.data;
+};
+
+/**
+ * Extract error message from ApiResponse format
+ * @param {object} error - Axios error object
+ * @returns {string} Error message
+ */
+const extractErrorMessage = (error) => {
+  if (error.response?.data?.message) {
+    return error.response.data.message;
+  }
+  if (error.response?.data?.detail) {
+    return error.response.data.detail;
+  }
+  return error.message || 'An error occurred';
+};
+
+/**
  * Fetch available dates that have logs
  * @returns {Promise<string[]>} Array of date strings (YYYY-MM-DD)
  */
 export const fetchDates = async () => {
   try {
     const response = await api.get('/api/logs/by-date');
+    const data = extractData(response);
     // Return array of dates from the response
-    return response.data.logs_by_date.map(item => item.date);
+    return (data?.logsByDate || []).map(item => item.date);
   } catch (error) {
     console.error('Error fetching dates:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
@@ -29,8 +59,8 @@ export const fetchDates = async () => {
 export const fetchLogsByDate = async (date) => {
   try {
     const response = await api.get(`/api/logs/date/${date}`);
-    // Transform the response to match frontend expectations
-    const logs = response.data.logs || [];
+    const data = extractData(response);
+    const logs = data?.logs || [];
     
     // Count commands by category
     const commands = {
@@ -42,7 +72,7 @@ export const fetchLogsByDate = async (date) => {
     };
     
     logs.forEach(log => {
-      const cmd = log.command.toLowerCase();
+      const cmd = log.command?.toLowerCase() || '';
       if (cmd.startsWith('git')) commands.git++;
       else if (cmd.startsWith('docker')) commands.docker++;
       else if (cmd.includes('npm') || cmd.includes('node')) commands.node++;
@@ -57,7 +87,7 @@ export const fetchLogsByDate = async (date) => {
     
     return {
       entries: logs.map(log => ({
-        timestamp: new Date(log.timestamp).toISOString(),
+        timestamp: log.timestamp ? new Date(log.timestamp).toISOString() : new Date().toISOString(),
         time: log.time,
         user: log.user,
         working_directory: log.directory,
@@ -67,7 +97,7 @@ export const fetchLogsByDate = async (date) => {
     };
   } catch (error) {
     console.error('Error fetching logs:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
@@ -81,7 +111,7 @@ export const fetchLogsByDate = async (date) => {
  * @param {string} filters.search - Command search
  * @param {number} limit - Limit results
  * @param {number} offset - Offset for pagination
- * @returns {Promise<{logs: Array, total: number, limit: number, offset: number}>} Log entries
+ * @returns {Promise<{logs: Array, total: number, count: number}>} Log entries
  */
 export const fetchLogsWithFilters = async (filters = {}) => {
   try {
@@ -99,23 +129,25 @@ export const fetchLogsWithFilters = async (filters = {}) => {
     params.append('offset', filters.offset || 0);
     
     const response = await api.get(`/api/logs?${params.toString()}`);
+    const data = extractData(response);
     
     // Transform to match frontend expectations
     return {
-      logs: (response.data.logs || []).map(log => ({
+      logs: (data?.logs || []).map(log => ({
         timestamp: log.timestamp,
-        time: log.time || new Date(log.timestamp).toLocaleTimeString(),
+        time: log.time || (log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : ''),
         user: log.user,
         working_directory: log.directory,
         command: log.command
       })),
-      total: response.data.total,
-      limit: response.data.limit,
-      offset: response.data.offset
+      total: data?.total || 0,
+      count: data?.count || 0,
+      limit: filters.limit || 100,
+      offset: filters.offset || 0
     };
   } catch (error) {
     console.error('Error fetching logs with filters:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
@@ -134,17 +166,22 @@ export const analyzeLogs = async (date) => {
     };
   } catch (error) {
     console.error('Error analyzing logs:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
 export const refreshLogsFromFile = async () => {
   try {
-    const response = await api.post('/api/logs/refresh');
-    return response.data;
+    const response = await api.post('/api/reload-logs');
+    const data = extractData(response);
+    return {
+      message: response.data?.message || 'Logs reloaded successfully',
+      source: data?.source,
+      reloadedCount: data?.reloadedCount
+    };
   } catch (error) {
     console.error('Error refreshing logs:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
@@ -152,10 +189,11 @@ export const refreshLogsFromFile = async () => {
 export const fetchWatchFolders = async () => {
   try {
     const response = await api.get('/api/folders');
-    return response.data.folders || [];
+    const data = extractData(response);
+    return data?.folders || [];
   } catch (error) {
     console.error('Error fetching watch folders:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
@@ -166,30 +204,40 @@ export const addWatchFolder = async (path, filePatterns, recursive = true) => {
     if (recursive !== undefined) params.append('recursive', recursive);
     
     const response = await api.post(`/api/folders/add?${params.toString()}`);
-    return response.data;
+    const data = extractData(response);
+    return {
+      message: response.data?.message || 'Folder added successfully',
+      folder: data?.folder
+    };
   } catch (error) {
     console.error('Error adding watch folder:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
 export const removeWatchFolder = async (folderId) => {
   try {
     const response = await api.delete(`/api/folders/${folderId}`);
-    return response.data;
+    return {
+      message: response.data?.message || 'Folder removed successfully'
+    };
   } catch (error) {
     console.error('Error removing watch folder:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
 export const toggleWatchFolder = async (folderId) => {
   try {
     const response = await api.post(`/api/folders/${folderId}/toggle`);
-    return response.data;
+    const data = extractData(response);
+    return {
+      message: response.data?.message || 'Folder status updated',
+      isActive: data?.isActive
+    };
   } catch (error) {
     console.error('Error toggling watch folder:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
@@ -201,54 +249,65 @@ export const fetchFileChanges = async (params = {}) => {
     if (params.event_type) queryParams.append('event_type', params.event_type);
     if (params.file_extension) queryParams.append('file_extension', params.file_extension);
     if (params.limit) queryParams.append('limit', params.limit);
+    if (params.offset) queryParams.append('offset', params.offset);
     
     const response = await api.get(`/api/changes?${queryParams.toString()}`);
-    return response.data;
+    const data = extractData(response);
+    return {
+      total: data?.total || 0,
+      count: data?.count || 0,
+      changes: data?.changes || []
+    };
   } catch (error) {
     console.error('Error fetching file changes:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
 export const fetchChangesByDate = async () => {
   try {
     const response = await api.get('/api/changes/by-date');
-    return response.data.changes_by_date || [];
+    const data = extractData(response);
+    return data?.changesByDate || [];
   } catch (error) {
     console.error('Error fetching changes by date:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
 export const fetchFileChangeStats = async () => {
   try {
     const response = await api.get('/api/changes/stats');
-    return response.data;
+    const data = extractData(response);
+    return data || {};
   } catch (error) {
     console.error('Error fetching file change stats:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
 export const fetchLogFilterOptions = async () => {
   try {
     const response = await api.get('/api/logs/filter-options');
-    return response.data;
+    const data = extractData(response);
+    return data || { users: [], directories: [] };
   } catch (error) {
     console.error('Error fetching filter options:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
 export const deleteFileChange = async (changeId) => {
   try {
     const response = await api.delete(`/api/changes/${changeId}`);
-    return response.data;
+    return {
+      message: response.data?.message || 'File change deleted successfully',
+      id: extractData(response)?.id
+    };
   } catch (error) {
     console.error('Error deleting file change:', error);
-    throw error;
+    throw new Error(extractErrorMessage(error));
   }
 };
 
 export default api;
-
