@@ -47,11 +47,12 @@ Tracer는 리눅스 시스템의 셸 명령어 로그와 파일 변경사항을 
 ## 🛠 기술 스택
 
 ### Backend
-- **FastAPI**: 고성능 Python 웹 프레임워크
+- **Spring Boot 3.3.0**: Java 기반 웹 프레임워크
+- **Java 17**: 프로그래밍 언어
+- **Gradle**: 빌드 도구
+- **Spring Data JPA**: 데이터 접근 계층
 - **SQLite**: 경량 데이터베이스
-- **SQLAlchemy**: ORM
-- **Watchfiles**: 파일 시스템 감시
-- **Uvicorn**: ASGI 서버
+- **Hibernate**: ORM 프레임워크
 
 ### Frontend
 - **React 18**: UI 라이브러리
@@ -93,7 +94,9 @@ run-single.bat       # Windows
 
 ### 사전 요구사항
 
-- **Python 3.11+**
+- **Java 25+**
+- **Gradle Wrapper** (프로젝트에 포함되어 있음, 별도 설치 불필요)
+  - 또는 시스템에 **Gradle 8.10+** 설치
 - **Node.js 18+** 및 npm
 - **Docker** 및 Docker Compose (Docker 배포 시)
 - **Git**
@@ -112,17 +115,16 @@ cd tracer-be/tracer-be
 ```bash
 cd tracer-backend
 
-# 가상환경 생성
-python -m venv venv
-
-# 가상환경 활성화
-# Linux/Mac:
-source venv/bin/activate
+# Gradle Wrapper를 사용하여 빌드 (권장)
 # Windows:
-.\venv\Scripts\Activate.ps1
+.\gradlew.bat build
 
-# 의존성 설치
-pip install -r requirements.txt
+# Linux/Mac:
+chmod +x gradlew
+./gradlew build
+
+# 또는 시스템에 설치된 Gradle 사용
+gradle build
 ```
 
 #### 3. 명령어 로거 설치 (리눅스만)
@@ -141,24 +143,55 @@ chmod +x install_logger.sh
 
 #### 4. Backend 실행
 
+**로컬 개발 모드 (H2 인메모리 데이터베이스 사용 - 권장):**
+
+로컬 개발 시 H2 인메모리 데이터베이스를 사용하면 별도의 데이터베이스 파일 없이 빠르게 개발할 수 있습니다.
+
 **Windows:**
 ```bash
-.\start_backend.bat
+.\gradlew.bat bootRun --args='--spring.profiles.active=local'
 ```
 
 **Linux/Mac:**
 ```bash
-chmod +x run.sh
-./run.sh
+./gradlew bootRun --args='--spring.profiles.active=local'
 ```
 
-또는 수동 실행:
+또는 환경 변수로 설정:
 ```bash
-cd app
-uvicorn main:app --reload
+# Windows (PowerShell)
+$env:SPRING_PROFILES_ACTIVE="local"
+.\gradlew.bat bootRun
+
+# Linux/Mac
+export SPRING_PROFILES_ACTIVE=local
+./gradlew bootRun
+```
+
+**프로덕션 모드 (SQLite 사용):**
+```bash
+# Windows
+.\gradlew.bat bootRun
+
+# Linux/Mac
+./gradlew bootRun
+```
+
+또는 빌드 후 실행:
+```bash
+# 빌드
+./gradlew build
+
+# JAR 파일 실행 (로컬 프로파일)
+java -jar build/libs/tracer-backend-1.0.0.jar --spring.profiles.active=local
+
+# JAR 파일 실행 (기본 SQLite)
+java -jar build/libs/tracer-backend-1.0.0.jar
 ```
 
 Backend가 `http://localhost:8000`에서 실행됩니다.
+
+**참고:** 로컬 프로파일 사용 시 H2 콘솔이 http://localhost:8000/h2-console 에서 제공됩니다.
 
 #### 5. Frontend 설정
 
@@ -237,14 +270,14 @@ docker-compose -f docker-compose.single.yml logs -f
 │  ├─ Frontend (React SPA)           │
 │  └─ API Proxy → Backend             │
 ├─────────────────────────────────────┤
-│  FastAPI Backend (Port 8000)       │
+│  Spring Boot Backend (Port 8000)   │
 │  ├─ File Watcher Service           │
 │  ├─ Command Log API                │
 │  └─ SQLite Database                │
 ├─────────────────────────────────────┤
 │  Supervisor                        │
 │  ├─ nginx process                  │
-│  └─ uvicorn process                │
+│  └─ java process                   │
 └─────────────────────────────────────┘
 ```
 
@@ -254,19 +287,21 @@ docker-compose -f docker-compose.single.yml logs -f
 
 | 변수명 | 기본값 | 설명 |
 |--------|--------|------|
-| `DATABASE_URL` | `sqlite:///./data/logs.db` | 데이터베이스 연결 URL |
-| `COMMAND_HISTORY_PATH` | `/app/app/data/.command_log.jsonl` | 명령어 로그 파일 경로 |
+| `SPRING_DATASOURCE_URL` | `jdbc:sqlite:./data/logs.db` | 데이터베이스 연결 URL |
+| `DATABASE_URL` | `jdbc:sqlite:./data/logs.db` | 데이터베이스 연결 URL (호환성) |
+| `COMMAND_HISTORY_PATH` | `/app/data/.command_log.jsonl` | 명령어 로그 파일 경로 |
 | `VITE_API_URL` | `http://localhost` | 프론트엔드 API 기본 URL |
+| `SERVER_PORT` | `8000` | 백엔드 서버 포트 |
 
 ### 볼륨 마운트
 
 ```yaml
 volumes:
   # 데이터 지속성을 위한 데이터 디렉터리
-  - ./tracer-backend/data:/app/app/data
+  - ./tracer-backend/data:/app/data
   
   # 명령어 로그 파일 (선택사항)
-  - ~/.command_log.jsonl:/app/app/data/.command_log.jsonl:ro
+  - ~/.command_log.jsonl:/app/data/.command_log.jsonl:ro
   
   # 호스트 파일시스템 접근 (파일 감시용)
   - .:/host/current
@@ -275,6 +310,19 @@ volumes:
 ```
 
 ## 📡 API 문서
+
+### Swagger UI
+
+애플리케이션 실행 후 다음 URL에서 인터랙티브 API 문서를 확인할 수 있습니다:
+
+- **Swagger UI**: http://localhost:8091/swagger-ui.html (Docker) 또는 http://localhost:8000/swagger-ui.html (로컬)
+- **OpenAPI JSON**: http://localhost:8091/api-docs (Docker) 또는 http://localhost:8000/api-docs (로컬)
+
+Swagger UI를 통해:
+- 모든 API 엔드포인트 확인
+- 요청/응답 스키마 확인
+- 직접 API 테스트 (Try it out 기능)
+- 요청 예제 확인
 
 ### 주요 엔드포인트
 
@@ -302,9 +350,11 @@ volumes:
 
 ### API 문서 접속
 
-서비스 실행 후 다음 URL에서 인터랙티브 API 문서를 확인할 수 있습니다:
-- **Swagger UI**: http://localhost:8091/docs
-- **ReDoc**: http://localhost:8091/redoc
+서비스 실행 후 다음 URL에서 API를 확인할 수 있습니다:
+- **API Base**: http://localhost:8091/api
+- **Swagger UI**: http://localhost:8091/swagger-ui.html
+- **OpenAPI JSON**: http://localhost:8091/api-docs
+- **Health Check**: http://localhost:8091/health
 
 ### 예제 요청
 
@@ -330,16 +380,23 @@ curl -X POST "http://localhost:8091/api/folders/add?path=/host/current&recursive
 ```
 tracer-be/
 ├── tracer-backend/          # Backend 서비스
-│   ├── app/
-│   │   ├── main.py          # FastAPI 애플리케이션
-│   │   ├── models.py        # 데이터베이스 모델
-│   │   ├── file_watcher.py # 파일 감시 서비스
-│   │   └── routes/          # API 라우트
-│   │       ├── logs.py      # 명령어 로그 API
-│   │       └── file_watch.py # 파일 감시 API
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/tracer/
+│   │   │   │   ├── TracerApplication.java  # Spring Boot 메인 클래스
+│   │   │   │   ├── controller/             # REST 컨트롤러
+│   │   │   │   │   ├── LogsController.java
+│   │   │   │   │   ├── FileWatchController.java
+│   │   │   │   │   └── HealthController.java
+│   │   │   │   ├── service/                # 비즈니스 로직
+│   │   │   │   ├── repository/            # 데이터 접근 계층
+│   │   │   │   ├── entity/                 # 엔티티 모델
+│   │   │   │   └── config/                 # 설정 클래스
+│   │   │   └── resources/                  # 설정 파일
+│   │   └── test/                           # 테스트 코드
 │   ├── data/                # 데이터 디렉터리
-│   ├── requirements.txt     # Python 의존성
-│   ├── Dockerfile           # Backend Dockerfile
+│   ├── build.gradle         # Gradle 빌드 설정
+│   ├── settings.gradle      # Gradle 프로젝트 설정
 │   └── README.md            # Backend README
 │
 ├── tracer-frontend/         # Frontend 애플리케이션
@@ -415,7 +472,7 @@ docker ps -a
 
 3. 백엔드가 로그 파일을 읽을 수 있는지 확인:
    ```bash
-   docker exec tracer-app ls -la /app/app/data/.command_log.jsonl
+   docker exec tracer-app ls -la /app/data/.command_log.jsonl
    ```
 
 자세한 트러블슈팅 가이드는 다음 문서를 참조하세요:

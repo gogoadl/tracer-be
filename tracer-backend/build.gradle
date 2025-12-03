@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.0'
+    id 'io.spring.dependency-management' version '1.1.5'
+}
+
+group = 'com.tracer'
+version = '1.0.0'
+sourceCompatibility = '21'
+targetCompatibility = '21'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    
+    // Spring Boot Data JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    
+    // H2 Database (for local development)
+    runtimeOnly 'com.h2database:h2'
+    
+    // SQLite JDBC (for production/Docker)
+    implementation 'org.xerial:sqlite-jdbc:3.44.1.0'
+    
+    // SQLite Dialect for Hibernate
+    implementation 'org.hibernate.orm:hibernate-community-dialects'
+    
+    // Spring Boot Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    
+    // SpringDoc OpenAPI (Swagger) for API documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    // Swagger models (required for OpenAPI models)
+    implementation 'io.swagger.core.v3:swagger-models:2.2.22'
+    
+    // Jackson for JSON (usually included in spring-boot-starter-web, but explicit for clarity)
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // Spring Boot DevTools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    
+    // Spring Boot Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.named('bootJar') {
+    archiveFileName = 'tracer-backend-1.0.0.jar'
+}
+

@@ -24,19 +24,19 @@ RUN npm run build
 RUN ls -la /frontend/dist/
 
 # Stage 2: Build Spring Boot Backend
-FROM maven:3.9-eclipse-temurin-17 AS backend-build
+FROM gradle:8.5-jdk21 AS backend-build
 
 WORKDIR /build
 
-# Copy Maven files
-COPY tracer-backend/pom.xml ./
+# Copy Gradle files
+COPY tracer-backend/build.gradle tracer-backend/settings.gradle ./
 COPY tracer-backend/src ./src
 
 # Build Spring Boot application
-RUN mvn clean package -DskipTests
+RUN gradle clean bootJar --no-daemon -x test
 
 # Stage 3: Setup Backend with Frontend
-FROM eclipse-temurin:17-jre-slim
+FROM eclipse-temurin:25-jre-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -83,7 +83,7 @@ RUN mkdir -p /usr/local/bin && \
     chmod +x /usr/local/bin/install-command-logger.sh
 
 # Copy built Spring Boot JAR from build stage
-COPY --from=backend-build /build/target/tracer-backend-1.0.0.jar /app/tracer-backend.jar
+COPY --from=backend-build /build/build/libs/tracer-backend-1.0.0.jar /app/tracer-backend.jar
 
 # Copy data directory (will be mounted at runtime, but needed for initial setup)
 COPY tracer-backend/data/ ./data/
