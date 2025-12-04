@@ -117,7 +117,7 @@ autorestart=true
 stderr_logfile=/var/log/supervisor/backend.err.log
 stdout_logfile=/var/log/supervisor/backend.out.log
 priority=100
-environment=SPRING_DATASOURCE_URL="jdbc:sqlite:./data/logs.db",COMMAND_HISTORY_PATH="/app/data/.command_log.jsonl",DATABASE_URL="jdbc:sqlite:./data/logs.db"
+environment=SPRING_DATASOURCE_URL="jdbc:sqlite:./data/logs.db",COMMAND_HISTORY_PATH="/app/data/.command_log.jsonl",DATABASE_URL="jdbc:sqlite:./data/logs.db",SERVER_PORT="8080"
 
 [program:nginx]
 command=nginx -g "daemon off;"

@@ -7,6 +7,10 @@ echo "=== Building Tracer Single Image ==="
 # Build with no cache for clean build
 echo "Building Tracer image..."
 echo "⚠️  This will rebuild the frontend with updated API settings"
+echo "⚠️  Removing old images and containers..."
+docker compose -f docker-compose.single.yml down 2>/dev/null || true
+docker rmi tracer:latest 2>/dev/null || true
+echo "Building fresh image..."
 docker build -t tracer:latest . --no-cache
 
 if [ $? -ne 0 ]; then
