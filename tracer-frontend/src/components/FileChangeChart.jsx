@@ -50,7 +50,13 @@ const FileChangeChart = () => {
     );
   }
 
-  if (!stats || stats.total_changes === 0) {
+  // Safe defaults - handle both old and new response formats
+  const totalChanges = stats?.totalChanges || stats?.total_changes || 0;
+  const changesByEventType = stats?.changesByEventType || stats?.event_types || {};
+  const changesByExtension = stats?.changesByExtension || stats?.changes_by_extension || {};
+  const statsChangesByDate = stats?.changesByDate || {};
+
+  if (!stats || totalChanges === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
@@ -63,21 +69,26 @@ const FileChangeChart = () => {
     );
   }
 
-  // Prepare data for charts
-  const eventTypeData = Object.entries(stats.event_types).map(([name, value]) => ({
-    name: name.charAt(0).toUpperCase() + name.slice(1),
-    value
-  }));
+  // Prepare data for charts with safe handling
+  const eventTypeData = changesByEventType && typeof changesByEventType === 'object' && !Array.isArray(changesByEventType)
+    ? Object.entries(changesByEventType)
+        .filter(([_, value]) => value != null)
+        .map(([name, value]) => ({
+          name: name.charAt(0).toUpperCase() + name.slice(1),
+          value: typeof value === 'number' ? value : 0
+        }))
+    : [];
 
-  const topExtensionsData = stats.top_extensions.slice(0, 5).map(item => ({
-    name: item.extension || 'No extension',
-    count: item.count
-  }));
-
-  const topDirectoriesData = stats.top_directories.slice(0, 5).map(item => ({
-    name: item.directory.length > 40 ? '...' + item.directory.slice(-37) : item.directory,
-    count: item.count
-  }));
+  const topExtensionsData = changesByExtension && typeof changesByExtension === 'object' && !Array.isArray(changesByExtension)
+    ? Object.entries(changesByExtension)
+        .filter(([_, count]) => count != null)
+        .sort(([_, a], [__, b]) => (b || 0) - (a || 0))
+        .slice(0, 5)
+        .map(([name, count]) => ({
+          name: name || 'No extension',
+          count: typeof count === 'number' ? count : 0
+        }))
+    : [];
 
   return (
     <div className="space-y-6">
@@ -103,19 +114,23 @@ const FileChangeChart = () => {
           <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
             <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">Total Changes</p>
             <p className="text-2xl font-bold text-blue-800 dark:text-blue-300">
-              {stats.total_changes}
+              {totalChanges}
             </p>
           </div>
           <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
             <p className="text-sm text-green-600 dark:text-green-400 mb-1">File Extensions</p>
             <p className="text-2xl font-bold text-green-800 dark:text-green-300">
-              {stats.top_extensions.length}
+              {changesByExtension && typeof changesByExtension === 'object' 
+                ? Object.keys(changesByExtension).length 
+                : 0}
             </p>
           </div>
           <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-            <p className="text-sm text-purple-600 dark:text-purple-400 mb-1">Directories</p>
+            <p className="text-sm text-purple-600 dark:text-purple-400 mb-1">Event Types</p>
             <p className="text-2xl font-bold text-purple-800 dark:text-purple-300">
-              {stats.top_directories.length}
+              {changesByEventType && typeof changesByEventType === 'object' 
+                ? Object.keys(changesByEventType).length 
+                : 0}
             </p>
           </div>
         </div>
@@ -182,15 +197,22 @@ const FileChangeChart = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Top Directories */}
+        {/* Changes by Date (Bar Chart) */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            Most Active Directories
+            Changes by Date
           </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={topDirectoriesData}>
+            <BarChart data={Object.entries(statsChangesByDate)
+              .filter(([_, count]) => count != null)
+              .sort(([a], [b]) => a.localeCompare(b))
+              .slice(-10)
+              .map(([date, count]) => ({
+                date: date,
+                count: typeof count === 'number' ? count : 0
+              }))}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-              <XAxis dataKey="name" stroke="#666" angle={-45} textAnchor="end" height={100} />
+              <XAxis dataKey="date" stroke="#666" angle={-45} textAnchor="end" height={100} />
               <YAxis stroke="#666" />
               <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }} />
               <Bar dataKey="count" fill="#82ca9d" />
