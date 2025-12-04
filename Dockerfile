@@ -148,7 +148,7 @@ server {
 
     # API proxy to backend - catch all /api/ requests
     location /api/ {
-        proxy_pass http://127.0.0.1:8000;
+        proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -164,7 +164,7 @@ server {
 
     # Health check proxy
     location /health {
-        proxy_pass http://127.0.0.1:8000/health;
+        proxy_pass http://127.0.0.1:8080/health;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_connect_timeout 10s;
@@ -174,7 +174,7 @@ server {
 
     # Spring Boot Actuator endpoints (if enabled)
     location /actuator {
-        proxy_pass http://127.0.0.1:8000/actuator;
+        proxy_pass http://127.0.0.1:8080/actuator;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }

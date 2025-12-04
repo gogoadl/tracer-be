@@ -189,9 +189,9 @@ java -jar build/libs/tracer-backend-1.0.0.jar --spring.profiles.active=local
 java -jar build/libs/tracer-backend-1.0.0.jar
 ```
 
-Backend가 `http://localhost:8000`에서 실행됩니다.
+Backend가 `http://localhost:8080`에서 실행됩니다.
 
-**참고:** 로컬 프로파일 사용 시 H2 콘솔이 http://localhost:8000/h2-console 에서 제공됩니다.
+**참고:** 로컬 프로파일 사용 시 H2 콘솔이 http://localhost:8080/h2-console 에서 제공됩니다.
 
 #### 5. Frontend 설정
 
@@ -315,8 +315,8 @@ volumes:
 
 애플리케이션 실행 후 다음 URL에서 인터랙티브 API 문서를 확인할 수 있습니다:
 
-- **Swagger UI**: http://localhost:8091/swagger-ui.html (Docker) 또는 http://localhost:8000/swagger-ui.html (로컬)
-- **OpenAPI JSON**: http://localhost:8091/api-docs (Docker) 또는 http://localhost:8000/api-docs (로컬)
+- **Swagger UI**: http://localhost:8091/swagger-ui.html (Docker) 또는 http://localhost:8080/swagger-ui.html (로컬)
+- **OpenAPI JSON**: http://localhost:8091/api-docs (Docker) 또는 http://localhost:8080/api-docs (로컬)
 
 Swagger UI를 통해:
 - 모든 API 엔드포인트 확인
@@ -455,7 +455,7 @@ docker ps -a
 
 1. 브라우저 캐시 삭제 (Ctrl+Shift+R 또는 Cmd+Shift+R)
 2. 브라우저 개발자 도구의 Network 탭 확인
-3. 요청이 `:8091`로 가는지 확인 (`:8000`이 아님)
+3. 요청이 `:8091`로 가는지 확인 (`:8080`이 아님)
 4. Nginx 로그 확인
 
 ### 명령어가 로깅되지 않는 경우

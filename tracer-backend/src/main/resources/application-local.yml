@@ -3,7 +3,7 @@
 
 # Server Configuration
 server:
-  port: 8000
+  port: 8080
 
 # H2 Database Configuration (In-Memory)
 spring:
@@ -23,7 +23,7 @@ spring:
       hibernate:
         format_sql: true
   
-  # H2 Console (for debugging - accessible at http://localhost:8000/h2-console)
+  # H2 Console (for debugging - accessible at http://localhost:8080/h2-console)
   h2:
     console:
       enabled: true

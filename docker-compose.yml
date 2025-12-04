@@ -8,21 +8,22 @@ services:
       dockerfile: Dockerfile
     container_name: tracer-backend
     ports:
-      - "8000:8000"
+      - "8080:8080"
     volumes:
-      - ./tracer-backend/data:/app/app/data
+      - ./tracer-backend/data:/app/data
       # Mount logs directory for Linux command logging (only if exists)
-      - ~/.command_log.jsonl:/app/app/data/.command_log.jsonl:ro
+      - ~/.command_log.jsonl:/app/data/.command_log.jsonl:ro
     environment:
-      - DATABASE_URL=sqlite:///./data/logs.db
-      - COMMAND_HISTORY_PATH=/app/app/data/.command_log.jsonl
+      - DATABASE_URL=jdbc:sqlite:./data/logs.db
+      - SPRING_DATASOURCE_URL=jdbc:sqlite:./data/logs.db
+      - COMMAND_HISTORY_PATH=/app/data/.command_log.jsonl
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     networks:
       - tracer-network
 
@@ -32,7 +33,7 @@ services:
       context: ./tracer-frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://localhost:8000
+        - VITE_API_URL=http://localhost:8080
     container_name: tracer-frontend
     ports:
       - "3000:80"

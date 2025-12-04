@@ -89,10 +89,10 @@ else
     docker exec tracer-app netstat -tlnp 2>/dev/null || docker exec tracer-app ss -tlnp 2>/dev/null || echo "  Cannot check ports"
 fi
 
-if docker exec tracer-app netstat -tlnp 2>/dev/null | grep -q ":8000"; then
-    echo "  ✅ Port 8000 is listening"
+if docker exec tracer-app netstat -tlnp 2>/dev/null | grep -q ":8080"; then
+    echo "  ✅ Port 8080 is listening"
 else
-    echo "  ❌ Port 8000 is not listening"
+    echo "  ❌ Port 8080 is not listening"
 fi
 
 echo ""
@@ -103,22 +103,22 @@ echo ""
 echo "🔍 Testing services..."
 
 # Test backend directly
-echo "Testing backend (port 8000):"
-if docker exec tracer-app curl -s http://127.0.0.1:8000/health > /dev/null; then
+echo "Testing backend (port 8080):"
+if docker exec tracer-app curl -s http://127.0.0.1:8080/health > /dev/null; then
     echo "  ✅ Backend is responding"
     
     # Test specific API endpoints
     echo "  Testing API endpoints:"
     
     # Test folders endpoint
-    if docker exec tracer-app curl -s http://127.0.0.1:8000/api/folders > /dev/null; then
+    if docker exec tracer-app curl -s http://127.0.0.1:8080/api/folders > /dev/null; then
         echo "    ✅ /api/folders endpoint working"
     else
         echo "    ❌ /api/folders endpoint failed"
     fi
     
     # Test root endpoint
-    if docker exec tracer-app curl -s http://127.0.0.1:8000/ > /dev/null; then
+    if docker exec tracer-app curl -s http://127.0.0.1:8080/ > /dev/null; then
         echo "    ✅ / endpoint working"
     else
         echo "    ❌ / endpoint failed"
@@ -148,7 +148,7 @@ if docker exec tracer-app curl -s http://127.0.0.1:8091/health > /dev/null; then
         echo "    Nginx error log:"
         docker exec tracer-app tail -20 /var/log/nginx/error.log 2>/dev/null || echo "    No error log"
         echo "    Testing backend connectivity from nginx:"
-        docker exec tracer-app curl -v http://127.0.0.1:8000/health 2>&1 | head -15 || echo "    Cannot connect to backend"
+        docker exec tracer-app curl -v http://127.0.0.1:8080/health 2>&1 | head -15 || echo "    Cannot connect to backend"
     fi
     
 else
@@ -204,7 +204,7 @@ echo ""
 echo "🔧 If API errors persist:"
 echo "  1. Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)"
 echo "  2. Check browser dev tools Network tab"
-echo "  3. Verify requests go to :8091, not :8000"
+echo "  3. Verify requests go to :8091, not :8080"
 echo "  4. Test specific endpoints:"
 echo "     curl http://localhost:8091/api/folders"
 echo "     curl -X POST \"http://localhost:8091/api/folders/add?path=/host/current&recursive=true\""

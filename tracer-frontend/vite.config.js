@@ -8,7 +8,7 @@ export default defineConfig({
     port: 5173,  // Changed from 3000 to 5173 (default Vite port)
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },

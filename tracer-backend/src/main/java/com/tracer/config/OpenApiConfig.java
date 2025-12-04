@@ -19,7 +19,7 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI tracerOpenAPI() {
         Server localServer = new Server();
-        localServer.setUrl("http://localhost:8000");
+        localServer.setUrl("http://localhost:8080");
         localServer.setDescription("Local Development Server");
         
         Server dockerServer = new Server();

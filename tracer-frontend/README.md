@@ -24,7 +24,7 @@ A modern React-based web application for viewing and analyzing command logs with
 ### Prerequisites
 
 - Node.js 18+ and npm
-- Backend API running on http://localhost:8000
+- Backend API running on http://localhost:8080
 
 ### Installation
 
@@ -70,7 +70,7 @@ Set the backend API URL:
 
 ```bash
 # .env file
-VITE_API_URL=http://your-backend-url:8000
+VITE_API_URL=http://your-backend-url:8080
 ```
 
 ## Project Structure

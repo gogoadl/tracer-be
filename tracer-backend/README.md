@@ -156,10 +156,10 @@ java -jar build/libs/tracer-backend-1.0.0.jar --spring.profiles.active=local
 java -jar build/libs/tracer-backend-1.0.0.jar
 ```
 
-애플리케이션이 `http://localhost:8000`에서 실행됩니다.
+애플리케이션이 `http://localhost:8080`에서 실행됩니다.
 
 **H2 콘솔 접속 (로컬 프로파일 사용 시):**
-- URL: http://localhost:8000/h2-console
+- URL: http://localhost:8080/h2-console
 - JDBC URL: `jdbc:h2:mem:tracerdb`
 - 사용자명: `sa`
 - 비밀번호: (비어있음)
@@ -254,8 +254,8 @@ chmod +x install_logger.sh
 
 애플리케이션 실행 후 다음 URL에서 인터랙티브 API 문서를 확인할 수 있습니다:
 
-- **Swagger UI**: http://localhost:8000/swagger-ui.html
-- **OpenAPI JSON**: http://localhost:8000/api-docs
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **OpenAPI JSON**: http://localhost:8080/api-docs
 
 Swagger UI를 통해:
 - 모든 API 엔드포인트 확인
@@ -307,28 +307,28 @@ Swagger UI를 통해:
 
 ```bash
 # 모든 로그 조회
-curl http://localhost:8000/api/logs
+curl http://localhost:8080/api/logs
 
 # 날짜 범위로 필터링
-curl "http://localhost:8000/api/logs?start_date=2025-01-01&end_date=2025-01-31"
+curl "http://localhost:8080/api/logs?start_date=2025-01-01&end_date=2025-01-31"
 
 # 키워드 검색
-curl "http://localhost:8000/api/logs?search=git"
+curl "http://localhost:8080/api/logs?search=git"
 
 # 날짜별 그룹화된 로그
-curl http://localhost:8000/api/logs/by-date
+curl http://localhost:8080/api/logs/by-date
 
 # 통계 조회
-curl http://localhost:8000/api/logs/stats
+curl http://localhost:8080/api/logs/stats
 
 # 특정 날짜 로그
-curl http://localhost:8000/api/logs/date/2025-01-27
+curl http://localhost:8080/api/logs/date/2025-01-27
 
 # 폴더 추가
-curl -X POST "http://localhost:8000/api/folders/add?path=/home/user/project&recursive=true"
+curl -X POST "http://localhost:8080/api/folders/add?path=/home/user/project&recursive=true"
 
 # 헬스 체크
-curl http://localhost:8000/health
+curl http://localhost:8080/health
 ```
 
 ## Docker 빌드
@@ -378,14 +378,15 @@ docker-compose -f docker-compose.single.yml up -d
 
 ```bash
 # 환경 변수로 포트 변경
-export SERVER_PORT=8001
+export SERVER_PORT=8081
 ./gradlew bootRun
 ```
 
-또는 `application.properties` 파일 수정:
+또는 `application.yml` 파일 수정:
 
-```properties
-server.port=8001
+```yaml
+server:
+  port: 8081
 ```
 
 ### 데이터베이스 파일 권한 문제
