@@ -85,6 +85,10 @@ RUN mkdir -p /usr/local/bin && \
 # Copy built Spring Boot JAR from build stage
 COPY --from=backend-build /build/build/libs/tracer-backend-1.0.0.jar /app/tracer-backend.jar
 
+# Verify JAR file exists and is executable
+RUN ls -lh /app/tracer-backend.jar && \
+    file /app/tracer-backend.jar || echo "JAR file verification failed"
+
 # Copy data directory (will be mounted at runtime, but needed for initial setup)
 COPY tracer-backend/data/ ./data/
 
@@ -110,14 +114,16 @@ logfile=/var/log/supervisor/supervisord.log
 pidfile=/var/run/supervisord.pid
 
 [program:backend]
-command=java -Xmx512m -Xms256m -jar /app/tracer-backend.jar
+command=java -Xmx512m -Xms256m -Dspring.profiles.active=default -jar /app/tracer-backend.jar
 directory=/app
 autostart=true
 autorestart=true
+startsecs=10
+startretries=3
 stderr_logfile=/var/log/supervisor/backend.err.log
 stdout_logfile=/var/log/supervisor/backend.out.log
 priority=100
-environment=SPRING_DATASOURCE_URL="jdbc:sqlite:./data/logs.db",COMMAND_HISTORY_PATH="/app/data/.command_log.jsonl",DATABASE_URL="jdbc:sqlite:./data/logs.db",SERVER_PORT="8080"
+environment=SPRING_DATASOURCE_URL="jdbc:sqlite:./data/logs.db",COMMAND_HISTORY_PATH="/app/data/.command_log.jsonl",DATABASE_URL="jdbc:sqlite:./data/logs.db",SERVER_PORT="8080",SPRING_PROFILES_ACTIVE="default"
 
 [program:nginx]
 command=nginx -g "daemon off;"
@@ -130,7 +136,7 @@ EOF
 
 # Create nginx configuration to proxy API requests
 RUN cat > /etc/nginx/conf.d/default.conf << 'EOF'
-server {
+    server {
     listen 8091;
     server_name localhost;
     root /usr/share/nginx/html;
