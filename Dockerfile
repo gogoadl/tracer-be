@@ -36,7 +36,7 @@ COPY tracer-backend/src ./src
 RUN gradle clean bootJar --no-daemon -x test
 
 # Stage 3: Setup Backend with Frontend
-FROM eclipse-temurin:21-jre-slim
+FROM eclipse-temurin:21-jre
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
